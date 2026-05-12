@@ -304,18 +304,13 @@ const heroSearch = document.getElementById("hero-search");
 const btnSearch  = document.querySelector(".btn-search");
 
 function executarBusca() {
-  const termo = heroSearch?.value.trim();
-  if (!termo) return;
-  // Por enquanto loga; substitua pela sua lógica real:
-  console.log("Buscando por:", termo);
-  alert(`Buscando por: "${termo}"`); // troque por sua lógica de resultados
+  window.open("fundacao.html", "_blank");
 }
 
 btnSearch?.addEventListener("click", executarBusca);
 heroSearch?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") executarBusca();
 });
-
 // No topo, junto aos outros imports:
 import { db } from "./firebase-config.js";
 import { collection, addDoc, serverTimestamp }
