@@ -315,3 +315,45 @@ btnSearch?.addEventListener("click", executarBusca);
 heroSearch?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") executarBusca();
 });
+
+// No topo, junto aos outros imports:
+import { db } from "./firebase-config.js";
+import { collection, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ─── Formulário de Feedback ──────────────────────────────────
+const formFeedback = document.getElementById("form-feedback");
+if (formFeedback) {
+  formFeedback.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById("fb-nome").value.trim();
+    const email = document.getElementById("fb-email").value.trim();
+    const msg   = document.getElementById("fb-msg").value.trim();
+
+    if (!nome || !email || !msg) {
+      alert("Preencha todos os campos antes de enviar.");
+      return;
+    }
+
+    const btn = formFeedback.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Enviando…";
+
+    try {
+      await addDoc(collection(db, "sugestoes"), {
+        nome,
+        email,
+        mensagem: msg,
+        criadoEm: serverTimestamp(),
+      });
+      formFeedback.reset();
+      alert("✅ Sugestão enviada! Obrigado pelo feedback.");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao enviar. Tente novamente.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Enviar Feedback";
+    }
+  });
+}
