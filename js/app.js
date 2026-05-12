@@ -3,7 +3,7 @@
 // Navegação SPA · Autenticação Firebase · Mapa Leaflet
 // ============================================================
 
-import { auth } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -11,6 +11,8 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { collection, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { initMap, initMapHome } from "./mapa.js";
 
 // ─── Estado ─────────────────────────────────────────────────
@@ -18,14 +20,14 @@ let currentUser = null;
 
 // ─── Referências de telas ────────────────────────────────────
 const screens = {
-  home:                 document.getElementById("screen-home"),
-  mapa:                 document.getElementById("screen-mapa"),
-  perfil:               document.getElementById("screen-perfil"),
-  login:                document.getElementById("screen-login"),
-  cadastro:             document.getElementById("screen-cadastro"),
-  explorar:             document.getElementById("screen-explorar"),
+  home:                   document.getElementById("screen-home"),
+  mapa:                   document.getElementById("screen-mapa"),
+  perfil:                 document.getElementById("screen-perfil"),
+  login:                  document.getElementById("screen-login"),
+  cadastro:               document.getElementById("screen-cadastro"),
+  explorar:               document.getElementById("screen-explorar"),
   "bibliotecas-digitais": document.getElementById("screen-bibliotecas-digitais"),
-  fundacao:             document.getElementById("screen-fundacao"),
+  fundacao:               document.getElementById("screen-fundacao"),
 };
 
 // ─── Pesquisa (home e explorar) ──────────────────────────────
@@ -57,13 +59,8 @@ function showScreen(name) {
     if (l.dataset.nav === name) l.classList.add("active");
   });
 
-  // Inicia mapas conforme a tela
-  if (name === "mapa") {
-    setTimeout(initMap, 100);
-  }
-  if (name === "home") {
-    setTimeout(initMapHome, 200);
-  }
+  if (name === "mapa") setTimeout(initMap, 100);
+  if (name === "home") setTimeout(initMapHome, 200);
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -76,7 +73,6 @@ document.addEventListener("click", (e) => {
 
   const dest = navEl.dataset.nav;
 
-  // Perfil requer login
   if (dest === "perfil" && !currentUser) {
     showScreen("login");
     return;
@@ -96,14 +92,11 @@ onAuthStateChanged(auth, (user) => {
   if (!authResolved) {
     authResolved = true;
 
-    // Remove overlay de carregamento
     const overlay = document.getElementById("loading-overlay");
     if (overlay) overlay.classList.add("hidden");
 
-    // Tela inicial: home sempre (landing page é pública)
     showScreen("home");
   } else {
-    // Mudança de estado após carregamento (ex: logout)
     if (!user) {
       const telaAtiva = Object.entries(screens).find(
         ([, el]) => el && el.classList.contains("active")
@@ -120,7 +113,6 @@ function atualizarHeaderAuth(user) {
   const btnLoginNav = document.getElementById("bottom-nav-login");
 
   if (user) {
-    // Logado: mostra avatar, esconde "Cadastro"
     if (btnCadastro) btnCadastro.style.display = "none";
     if (btnAvatar)   btnAvatar.style.display   = "flex";
 
@@ -133,7 +125,6 @@ function atualizarHeaderAuth(user) {
       initial.style.fontWeight = "900";
     }
 
-    // Troca botão "Entrar" no bottom-nav por "Perfil"
     if (btnLoginNav) {
       btnLoginNav.dataset.nav = "perfil";
       btnLoginNav.setAttribute("aria-label", "Perfil");
@@ -141,7 +132,6 @@ function atualizarHeaderAuth(user) {
       btnLoginNav.lastChild.textContent = "Perfil";
     }
   } else {
-    // Deslogado: mostra "Cadastro", esconde avatar
     if (btnCadastro) btnCadastro.style.display = "";
     if (btnAvatar)   btnAvatar.style.display   = "none";
 
@@ -149,7 +139,6 @@ function atualizarHeaderAuth(user) {
       btnLoginNav.dataset.nav = "login";
       btnLoginNav.setAttribute("aria-label", "Entrar");
       btnLoginNav.querySelector(".material-symbols-outlined").textContent = "login";
-      // Atualiza texto do label
       const span = btnLoginNav.querySelector(".material-symbols-outlined");
       if (span && span.nextSibling) span.nextSibling.textContent = "Entrar";
     }
@@ -232,10 +221,10 @@ if (formCadastro) {
     [["cad-nome","err-nome"],["cad-email","err-email"],["cad-senha","err-senha"],["cad-conf-senha","err-conf"]]
       .forEach(([f, e]) => limparErroCampo(f, e));
 
-    if (!nome)                { mostrarErroCampo("cad-nome",       "err-nome",  "Informe seu nome completo."); valido = false; }
-    if (!emailValido(email))  { mostrarErroCampo("cad-email",      "err-email", "Informe um e-mail válido."); valido = false; }
-    if (senha.length < 6)     { mostrarErroCampo("cad-senha",      "err-senha", "A senha deve ter ao menos 6 caracteres."); valido = false; }
-    if (senha !== conf)       { mostrarErroCampo("cad-conf-senha", "err-conf",  "As senhas não coincidem."); valido = false; }
+    if (!nome)               { mostrarErroCampo("cad-nome",       "err-nome",  "Informe seu nome completo."); valido = false; }
+    if (!emailValido(email)) { mostrarErroCampo("cad-email",      "err-email", "Informe um e-mail válido."); valido = false; }
+    if (senha.length < 6)    { mostrarErroCampo("cad-senha",      "err-senha", "A senha deve ter ao menos 6 caracteres."); valido = false; }
+    if (senha !== conf)      { mostrarErroCampo("cad-conf-senha", "err-conf",  "As senhas não coincidem."); valido = false; }
     if (!valido) return;
 
     const btn = formCadastro.querySelector("button[type=submit]");
@@ -317,29 +306,13 @@ document.querySelectorAll(".tabs").forEach(grupo => {
     });
   });
 });
-// ─── Pesquisa ────────────────────────────────────────────────
-const heroSearch = document.getElementById("hero-search");
-const btnSearch  = document.querySelector(".btn-search");
-
-function executarBusca() {
-  window.open("fundacao.html", "_blank");
-}
-
-btnSearch?.addEventListener("click", executarBusca);
-heroSearch?.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") executarBusca();
-});
-// No topo, junto aos outros imports:
-import { db } from "./firebase-config.js";
-import { collection, addDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ─── Formulário de Feedback ──────────────────────────────────
 const formFeedback = document.getElementById("form-feedback");
 if (formFeedback) {
   formFeedback.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const nome = document.getElementById("fb-nome").value.trim();
+    const nome  = document.getElementById("fb-nome").value.trim();
     const email = document.getElementById("fb-email").value.trim();
     const msg   = document.getElementById("fb-msg").value.trim();
 
