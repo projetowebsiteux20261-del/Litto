@@ -988,7 +988,7 @@ body {
 
 /* Rodapé */
 .site-footer {
-  margin-bottom: calc(var(--footer-h) + 20px);
+  margin-bottom: 0;
   background: var(--primary);
   border-top: 2px solid #000;
   padding: 3rem 5%;
