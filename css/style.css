@@ -111,9 +111,9 @@ body {
 
 /* ===== MAIN CONTENT ===== */
 #main-content {
-  margin-top: calc(var(--nav-h) + var(--devbar-h));  /* ← era só --nav-h */
+  margin-top: calc(var(--nav-h) + var(--devbar-h));
   flex: 1;
-  padding-bottom: calc(var(--footer-h) + 20px);
+  padding-bottom: 0;
 }
 
 /* ===== BOTTOM NAV (MOBILE) ===== */
