@@ -113,7 +113,7 @@ body {
 #main-content {
   margin-top: calc(var(--nav-h) + var(--devbar-h));
   flex: 1;
-  padding-bottom: 0;
+  padding-bottom: var(--footer-h);
 }
 
 /* ===== BOTTOM NAV (MOBILE) ===== */
