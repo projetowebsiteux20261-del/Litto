@@ -9,7 +9,7 @@
 //  3. Substitua o valor de TMDB_API_KEY abaixo
 // ============================================================
 
-const TMDB_API_KEY = 'SUA_CHAVE_TMDB_AQUI'; // ← troque isso
+const TMDB_API_KEY = '7dbf7128baf22521877136df552400b5'; // ← troque isso
 const TMDB_BASE    = 'https://api.themoviedb.org/3';
 const TMDB_IMG     = 'https://image.tmdb.org/t/p/w300';
 const OL_BASE      = 'https://openlibrary.org';
