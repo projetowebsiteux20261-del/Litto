@@ -14,6 +14,14 @@ import {
 import { collection, addDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { initMap, initMapHome } from "./mapa.js";
+// importação de APIs do arquivo 
+import {
+  searchBooks,
+  searchMedia,
+  findAdaptations,
+  renderBookCard,
+  renderMediaCard,
+} from './apis.js';
 
 // ─── Estado ─────────────────────────────────────────────────
 let currentUser = null;
