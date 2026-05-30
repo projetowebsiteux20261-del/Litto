@@ -378,6 +378,59 @@
     </section>
 
     <!-- ============================================================
+     TELA: BUSCA (livros + filmes/séries via API)
+============================================================ -->
+<section id="screen-busca" class="screen" aria-label="Busca de livros e mídias">
+  <div class="pt-8 pb-20 px-[5%] max-w-7xl mx-auto">
+
+    <h1 class="text-4xl font-black mb-2">Buscar</h1>
+    <p class="font-semibold text-gray-500 mb-8">Pesquise livros, filmes e séries simultaneamente.</p>
+
+    <!-- Barra de busca -->
+    <div class="search-bar mb-10" role="search">
+      <input id="busca-input" type="search"
+             placeholder="Título, autor, personagem…"
+             aria-label="Pesquisar livros e mídias" />
+      <button id="busca-btn" class="btn btn--primary">
+        <span class="material-symbols-outlined" aria-hidden="true">search</span>
+        Buscar
+      </button>
+    </div>
+
+    <!-- Resultados: Livros -->
+    <section aria-labelledby="resultado-livros-h" class="mb-12">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-blue border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <span class="material-symbols-outlined text-white text-xl">menu_book</span>
+        </div>
+        <h2 id="resultado-livros-h" class="text-2xl font-black">Livros</h2>
+      </div>
+      <div id="busca-livros" class="search-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- Resultados: Filmes & Séries -->
+    <section aria-labelledby="resultado-midia-h">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-orange border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <span class="material-symbols-outlined text-white text-xl">movie</span>
+        </div>
+        <h2 id="resultado-midia-h" class="text-2xl font-black">Filmes &amp; Séries</h2>
+      </div>
+      <div id="busca-midia" class="search-grid" aria-live="polite"></div>
+    </section>
+
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div>
+      <span class="footer-logo">Litto Book Club.</span>
+      <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
+    </div>
+    <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+  </footer>
+</section>
+    
+    <!-- ============================================================
          TELA: BIBLIOTECAS DIGITAIS
     ============================================================ -->
     <section id="screen-bibliotecas-digitais" class="screen" aria-label="Bibliotecas Digitais">
