@@ -84,45 +84,18 @@ document.getElementById("busca-input")?.addEventListener("keydown", (e) => {
 });
 
 async function realizarBusca(query) {
-  const livrosEl = document.getElementById("busca-livros");
-  const midiaEl  = document.getElementById("busca-midia");
+  const midiaEl = document.getElementById("busca-midia");
+  if (midiaEl) midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Buscando filmes e séries…</p>';
 
-  if (livrosEl) livrosEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Buscando livros…</p>';
-  if (midiaEl)  midiaEl.innerHTML  = '<p class="opacity-50 text-sm col-span-full">Buscando filmes e séries…</p>';
+  const midiaResult = await Promise.allSettled([searchMedia(query, 12)]);
+  const resultado = midiaResult[0];
 
-  const [livrosResult, midiaResult] = await Promise.allSettled([
-    searchBooks(query, 12),
-    searchMedia(query, 6),
-  ]);
-
-  // Livros
-  if (livrosEl) {
-    if (livrosResult.status === 'rejected') {
-      console.error('Erro livros:', livrosResult.reason);
-      livrosEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Erro ao buscar livros. Tente novamente.</p>';
-    } else {
-      const livros = livrosResult.value;
-      if (livros.length === 0) {
-        livrosEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Nenhum livro encontrado.</p>';
-      } else {
-        livrosEl.innerHTML = livros.map(b => renderLivroCard(b)).join('');
-        livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
-          el.addEventListener('click', () => abrirLivro(
-            el.dataset.livroId, el.dataset.livroTitulo,
-            el.dataset.livroAutor, el.dataset.livroCover, el.dataset.livroAno
-          ));
-        });
-      }
-    }
-  }
-
-  // Mídia
   if (midiaEl) {
-    if (midiaResult.status === 'rejected') {
-      console.error('Erro mídia:', midiaResult.reason);
+    if (resultado.status === 'rejected') {
+      console.error('Erro mídia:', resultado.reason);
       midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Erro ao buscar filmes/séries.</p>';
     } else {
-      const todos = [...(midiaResult.value.movies || []), ...(midiaResult.value.series || [])];
+      const todos = [...(resultado.value.movies || []), ...(resultado.value.series || [])];
       if (todos.length === 0) {
         midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Nenhuma mídia encontrada.</p>';
       } else {
@@ -213,7 +186,7 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
   try {
     const [detalhes, livros] = await Promise.allSettled([
       getMediaDetails(Number(id), tipo),
-      searchBooks(titulo, 4),
+      searchBooks(titulo, 8),
     ]);
 
     if (detalhes.status === 'fulfilled') {
@@ -234,8 +207,29 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
     }
 
     const livrosEl = document.getElementById('midia-livros');
-    if (livros.status === 'fulfilled' && livros.value.length > 0) {
-      livrosEl.innerHTML = livros.value.slice(0, 4).map(b => renderLivroCard(b)).join('');
+    let livrosData = livros.status === 'fulfilled' ? livros.value : [];
+
+    // Se não achou nada com título traduzido, tenta buscar com título original do TMDB
+    if (livrosData.length === 0 && detalhes.status === 'fulfilled') {
+      const tituloOriginal = detalhes.value.original_title || detalhes.value.title || titulo;
+      if (tituloOriginal !== titulo) {
+        try {
+          livrosData = await searchBooks(tituloOriginal, 8);
+        } catch(_) {}
+      }
+    }
+
+    // Filtra livros com relevância — prioriza os que têm o título no nome
+    const palavras = titulo.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    const comScore = livrosData.map(b => ({
+      ...b,
+      _score: palavras.filter(w => b.title.toLowerCase().includes(w)).length
+    }));
+    const relevantes = comScore.filter(b => b._score > 0).sort((a,b) => b._score - a._score);
+    const exibir = relevantes.length > 0 ? relevantes : livrosData;
+
+    if (exibir.length > 0) {
+      livrosEl.innerHTML = exibir.slice(0, 4).map(b => renderLivroCard(b)).join('');
       livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
         el.addEventListener('click', () => abrirLivro(
           el.dataset.livroId, el.dataset.livroTitulo,
