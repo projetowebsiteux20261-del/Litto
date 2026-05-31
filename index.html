@@ -63,14 +63,15 @@
     .neo-border-thick { border: 4px solid #000; }
 
     #screen-explorar, #screen-bibliotecas-digitais, #screen-fundacao,
-    #screen-busca, #screen-livro {
+    #screen-busca, #screen-livro, #screen-midia {
       display: none;
     }
     #screen-explorar.active,
     #screen-bibliotecas-digitais.active,
     #screen-fundacao.active,
     #screen-busca.active,
-    #screen-livro.active {
+    #screen-livro.active,
+    #screen-midia.active {
       display: block;
     }
   </style>
@@ -468,6 +469,62 @@
             </div>
           </div>
           <div class="h-full min-h-[300px] border-4 border-black bg-yellow flex items-center justify-center neo-brutal-shadow"><span class="material-symbols-outlined text-[120px] text-black" style="font-variation-settings:'FILL' 1">menu_book</span></div>
+        </section>
+
+      </div>
+      <footer class="site-footer" role="contentinfo">
+        <div>
+          <span class="footer-logo">Litto Book Club.</span>
+          <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
+        </div>
+        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+      </footer>
+    </section>
+
+    <!-- ============================================================
+         TELA: MÍDIA (página dinâmica de filme/série)
+    ============================================================ -->
+    <section id="screen-midia" class="screen" aria-label="Detalhes da mídia">
+      <div class="px-[5%] pb-20 relative overflow-hidden pt-8 max-w-7xl mx-auto">
+
+        <section class="max-w-6xl mx-auto mb-16">
+          <button id="midia-back-btn" class="flex items-center gap-2 font-black text-sm uppercase border-2 border-black px-4 py-2 mb-8 hover:bg-black hover:text-white transition-all">
+            <span class="material-symbols-outlined text-lg">arrow_back</span> Voltar
+          </button>
+          <div class="fundacao-form-card p-8 md:p-12 flex flex-col md:flex-row gap-12 items-start">
+            <div class="w-full md:w-1/4 shrink-0">
+              <div id="midia-poster-wrap">
+                <div class="book-icon-container bg-orange border-4 border-black shadow-[16px_16px_0px_0px_#5065ff]">
+                  <span class="material-symbols-outlined text-white text-8xl" style="font-variation-settings:'FILL' 1,'wght' 700">movie</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex-1 space-y-6">
+              <div>
+                <div id="midia-tags" class="flex flex-wrap gap-2 mb-4"></div>
+                <h1 id="midia-titulo" class="text-5xl font-extrabold leading-none tracking-tight mb-2">–</h1>
+                <p id="midia-tipo-ano" class="text-2xl font-bold text-orange">–</p>
+              </div>
+              <p id="midia-descricao" class="text-lg leading-relaxed opacity-80">Carregando sinopse…</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t-2 border-black">
+                <div><p class="text-xs uppercase font-black opacity-50 mb-1">Avaliação</p><p id="midia-rating" class="font-bold">–</p></div>
+                <div><p class="text-xs uppercase font-black opacity-50 mb-1">Duração / Temporadas</p><p id="midia-extra" class="font-bold">–</p></div>
+                <div>
+                  <p class="text-xs uppercase font-black opacity-50 mb-1">TMDB</p>
+                  <a id="midia-tmdb-link" href="#" target="_blank" rel="noopener" class="font-bold text-orange underline">Ver no TMDB</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Livros relacionados -->
+        <section class="max-w-6xl mx-auto mb-16 bg-blue/5 p-10 border-2 border-black shadow-[8px_8px_0px_0px_rgba(80,101,255,1)]">
+          <h2 class="text-3xl font-bold mb-2">Livros Relacionados</h2>
+          <p class="text-blue font-bold mb-8">Das telas para as páginas</p>
+          <div id="midia-livros" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <p class="opacity-50 col-span-full text-sm">Buscando livros relacionados…</p>
+          </div>
         </section>
 
       </div>
