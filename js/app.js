@@ -21,6 +21,7 @@ import {
   findAdaptations,
   getBookDetails,
   getMediaDetails,
+  searchBooksByGenres,
   renderBookCard,
   renderMediaCard,
 } from './apis.js';
@@ -184,60 +185,43 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
   }
 
   try {
-    const [detalhes, livros] = await Promise.allSettled([
-      getMediaDetails(Number(id), tipo),
-      searchBooks(titulo, 8),
-    ]);
+    // Primeiro busca os detalhes para ter os gêneros
+    const detalhes = await getMediaDetails(Number(id), tipo).catch(() => null);
 
-    if (detalhes.status === 'fulfilled') {
-      const d = detalhes.value;
-      if (d.overview) document.getElementById('midia-descricao').textContent = d.overview;
-      document.getElementById('midia-tmdb-link').href = d.tmdbUrl || '#';
-      if (d.runtime) document.getElementById('midia-extra').textContent = d.runtime;
-      if (d.seasons) document.getElementById('midia-extra').textContent = `${d.seasons} temporada(s)`;
+    if (detalhes) {
+      if (detalhes.overview) document.getElementById('midia-descricao').textContent = detalhes.overview;
+      document.getElementById('midia-tmdb-link').href = detalhes.tmdbUrl || '#';
+      if (detalhes.runtime) document.getElementById('midia-extra').textContent = detalhes.runtime;
+      if (detalhes.seasons) document.getElementById('midia-extra').textContent = `${detalhes.seasons} temporada(s)`;
 
       const tagsEl = document.getElementById('midia-tags');
       const cores = ['bg-orange text-white', 'bg-blue text-white', 'bg-yellow text-black'];
-      (d.genres || []).slice(0, 4).forEach((g, i) => {
+      (detalhes.genres || []).slice(0, 4).forEach((g, i) => {
         const span = document.createElement('span');
         span.className = `${cores[i % cores.length]} px-3 py-1 font-black text-xs uppercase border-2 border-black`;
         span.textContent = g;
         tagsEl.appendChild(span);
       });
-    }
 
-    const livrosEl = document.getElementById('midia-livros');
-    let livrosData = livros.status === 'fulfilled' ? livros.value : [];
-
-    // Se não achou nada com título traduzido, tenta buscar com título original do TMDB
-    if (livrosData.length === 0 && detalhes.status === 'fulfilled') {
-      const tituloOriginal = detalhes.value.original_title || detalhes.value.title || titulo;
-      if (tituloOriginal !== titulo) {
-        try {
-          livrosData = await searchBooks(tituloOriginal, 8);
-        } catch(_) {}
+      // Busca livros pelos gêneros do TMDB
+      const livrosEl = document.getElementById('midia-livros');
+      try {
+        const livros = await searchBooksByGenres(detalhes.genres || [], 8);
+        if (livros.length > 0) {
+          livrosEl.innerHTML = livros.slice(0, 4).map(b => renderLivroCard(b)).join('');
+          livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
+            el.addEventListener('click', () => abrirLivro(
+              el.dataset.livroId, el.dataset.livroTitulo,
+              el.dataset.livroAutor, el.dataset.livroCover, el.dataset.livroAno
+            ));
+          });
+        } else {
+          livrosEl.innerHTML = '<p class="opacity-50 col-span-full text-sm">Nenhum livro relacionado encontrado para esses gêneros.</p>';
+        }
+      } catch(err) {
+        console.error('Erro ao buscar livros por gênero:', err);
+        document.getElementById('midia-livros').innerHTML = '<p class="opacity-50 col-span-full text-sm">Erro ao buscar livros relacionados.</p>';
       }
-    }
-
-    // Filtra livros com relevância — prioriza os que têm o título no nome
-    const palavras = titulo.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-    const comScore = livrosData.map(b => ({
-      ...b,
-      _score: palavras.filter(w => b.title.toLowerCase().includes(w)).length
-    }));
-    const relevantes = comScore.filter(b => b._score > 0).sort((a,b) => b._score - a._score);
-    const exibir = relevantes.length > 0 ? relevantes : livrosData;
-
-    if (exibir.length > 0) {
-      livrosEl.innerHTML = exibir.slice(0, 4).map(b => renderLivroCard(b)).join('');
-      livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
-        el.addEventListener('click', () => abrirLivro(
-          el.dataset.livroId, el.dataset.livroTitulo,
-          el.dataset.livroAutor, el.dataset.livroCover, el.dataset.livroAno
-        ));
-      });
-    } else {
-      livrosEl.innerHTML = '<p class="opacity-50 col-span-full text-sm">Nenhum livro relacionado encontrado.</p>';
     }
   } catch (err) {
     console.error('Erro ao carregar mídia:', err);
