@@ -158,8 +158,94 @@ export async function getMediaDetails(id, type) {
 }
 
 // ──────────────────────────────────────────
-//  RECOMENDAÇÕES CRUZADAS (livro ↔ mídia)
+//  MAPEAMENTO TMDB GÊNEROS → SUBJECTS Open Library
 // ──────────────────────────────────────────
+
+const GENRE_TO_SUBJECTS = {
+  // Ficção científica
+  'Ficção científica': ['science fiction', 'space opera', 'dystopia'],
+  'Science Fiction':   ['science fiction', 'space opera'],
+  // Fantasia
+  'Fantasia':          ['fantasy fiction', 'epic fantasy', 'magic'],
+  'Fantasy':           ['fantasy fiction', 'epic fantasy'],
+  // Terror / Horror
+  'Terror':            ['horror fiction', 'supernatural fiction'],
+  'Horror':            ['horror fiction', 'supernatural fiction'],
+  // Thriller / Suspense
+  'Thriller':          ['thrillers', 'suspense', 'mystery fiction'],
+  'Suspense':          ['thrillers', 'suspense'],
+  // Ação / Aventura
+  'Ação':              ['adventure fiction', 'action'],
+  'Aventura':          ['adventure fiction', 'action and adventure'],
+  'Action':            ['adventure fiction'],
+  'Adventure':         ['adventure fiction'],
+  // Drama
+  'Drama':             ['fiction', 'psychological fiction', 'literary fiction'],
+  // Romance
+  'Romance':           ['romance fiction', 'love stories'],
+  // Crime / Mistério
+  'Crime':             ['detective and mystery stories', 'crime fiction'],
+  'Mistério':          ['mystery fiction', 'detective and mystery stories'],
+  'Mystery':           ['mystery fiction'],
+  // Animação
+  'Animação':          ['fantasy fiction', 'adventure fiction'],
+  'Animation':         ['fantasy fiction'],
+  // Documentário
+  'Documentário':      ['nonfiction', 'biography'],
+  'Documentary':       ['nonfiction'],
+  // Família
+  'Família':           ['juvenile fiction', 'adventure fiction'],
+  'Family':            ['juvenile fiction'],
+  // História
+  'História':          ['historical fiction', 'history'],
+  'History':           ['historical fiction'],
+  // Guerra
+  'Guerra':            ['war stories', 'historical fiction', 'military fiction'],
+  'War':               ['war stories', 'military fiction'],
+  // Faroeste
+  'Faroeste':          ['western stories', 'frontier and pioneer life'],
+  'Western':           ['western stories'],
+  // Música
+  'Música':            ['music', 'biography'],
+  'Music':             ['music'],
+  // Comédia
+  'Comédia':           ['humorous fiction', 'comedy'],
+  'Comedy':            ['humorous fiction'],
+};
+
+/**
+ * Busca livros na Open Library baseado em gêneros do TMDB.
+ * @param {string[]} genres  Array de nomes de gêneros (vindo do TMDB)
+ * @param {number}   limit   Máx de resultados
+ */
+export async function searchBooksByGenres(genres = [], limit = 8) {
+  // Coleta subjects únicos mapeados dos gêneros
+  const subjects = [...new Set(
+    genres.flatMap(g => GENRE_TO_SUBJECTS[g] || [])
+  )];
+
+  if (subjects.length === 0) return [];
+
+  // Usa os 2 subjects mais relevantes pra não dispersar demais
+  const query = subjects.slice(0, 2).map(s => `subject:"${s}"`).join(' OR ');
+  const url = `${OL_BASE}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&fields=key,title,author_name,first_publish_year,cover_i,subject`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Erro ao buscar livros por gênero');
+  const data = await res.json();
+
+  return (data.docs || []).map(doc => ({
+    id:       doc.key,
+    title:    doc.title,
+    author:   doc.author_name?.[0] ?? 'Autor desconhecido',
+    year:     doc.first_publish_year ?? null,
+    cover:    doc.cover_i
+                ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
+                : null,
+    subjects: doc.subject?.slice(0, 5) ?? [],
+    olUrl:    `https://openlibrary.org${doc.key}`,
+  }));
+}
 
 /**
  * Dado um livro, busca adaptações ou obras relacionadas no TMDB.
