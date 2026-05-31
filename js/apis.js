@@ -25,7 +25,7 @@ const OL_BASE      = 'https://openlibrary.org';
  * @returns {Promise<Array>} Lista de livros formatados
  */
 export async function searchBooks(query, limit = 10) {
-  const url = `${OL_BASE}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&language=por,eng`;
+  const url = `${OL_BASE}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&fields=key,title,author_name,first_publish_year,cover_i,subject`;
   const res  = await fetch(url);
   if (!res.ok) throw new Error('Erro ao buscar livros');
   const data = await res.json();
