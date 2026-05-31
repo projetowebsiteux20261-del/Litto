@@ -20,6 +20,7 @@ import {
   searchMedia,
   findAdaptations,
   getBookDetails,
+  getMediaDetails,
   renderBookCard,
   renderMediaCard,
 } from './apis.js';
@@ -39,6 +40,7 @@ const screens = {
   fundacao:               document.getElementById("screen-fundacao"),
   busca:                  document.getElementById("screen-busca"),
   livro:                  document.getElementById("screen-livro"),
+  midia:                  document.getElementById("screen-midia"),
 };
 
 // ─── Histórico de navegação (para o botão Voltar do livro) ───
@@ -88,36 +90,53 @@ async function realizarBusca(query) {
   if (livrosEl) livrosEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Buscando livros…</p>';
   if (midiaEl)  midiaEl.innerHTML  = '<p class="opacity-50 text-sm col-span-full">Buscando filmes e séries…</p>';
 
-  try {
-    const [livros, midia] = await Promise.all([
-      searchBooks(query, 12),
-      searchMedia(query, 6).catch(() => ({ movies: [], series: [] })),
-    ]);
+  const [livrosResult, midiaResult] = await Promise.allSettled([
+    searchBooks(query, 12),
+    searchMedia(query, 6),
+  ]);
 
-    // Livros
-    if (livrosEl) {
+  // Livros
+  if (livrosEl) {
+    if (livrosResult.status === 'rejected') {
+      console.error('Erro livros:', livrosResult.reason);
+      livrosEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Erro ao buscar livros. Tente novamente.</p>';
+    } else {
+      const livros = livrosResult.value;
       if (livros.length === 0) {
         livrosEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Nenhum livro encontrado.</p>';
       } else {
         livrosEl.innerHTML = livros.map(b => renderLivroCard(b)).join('');
         livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
-          el.addEventListener('click', () => abrirLivro(el.dataset.livroId, el.dataset.livroTitulo, el.dataset.livroAutor, el.dataset.livroCover, el.dataset.livroAno));
+          el.addEventListener('click', () => abrirLivro(
+            el.dataset.livroId, el.dataset.livroTitulo,
+            el.dataset.livroAutor, el.dataset.livroCover, el.dataset.livroAno
+          ));
         });
       }
     }
+  }
 
-    // Mídia
-    if (midiaEl) {
-      const todos = [...(midia.movies || []), ...(midia.series || [])];
+  // Mídia
+  if (midiaEl) {
+    if (midiaResult.status === 'rejected') {
+      console.error('Erro mídia:', midiaResult.reason);
+      midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Erro ao buscar filmes/séries.</p>';
+    } else {
+      const todos = [...(midiaResult.value.movies || []), ...(midiaResult.value.series || [])];
       if (todos.length === 0) {
         midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Nenhuma mídia encontrada.</p>';
       } else {
-        midiaEl.innerHTML = todos.map(m => renderMediaCard(m)).join('');
+        midiaEl.innerHTML = todos.map(m => renderMidiaCard(m)).join('');
+        midiaEl.querySelectorAll('[data-midia-id]').forEach(el => {
+          el.addEventListener('click', () => abrirMidia(
+            el.dataset.midiaId, el.dataset.midiaTipo,
+            el.dataset.midiaTitulo, el.dataset.midiaPoster,
+            el.dataset.midiaAno, el.dataset.midiaRating,
+            el.dataset.midiaOverview
+          ));
+        });
       }
     }
-  } catch (err) {
-    console.error("Erro na busca:", err);
-    if (livrosEl) livrosEl.innerHTML = '<p class="text-red-500 text-sm col-span-full">Erro ao buscar. Tente novamente.</p>';
   }
 }
 
@@ -144,6 +163,98 @@ function renderLivroCard(book) {
 }
 
 // ─── Abre página dinâmica do livro ───────────────────────────
+
+function renderMidiaCard(media) {
+  const tipo = media.type === 'movie' ? 'Filme' : 'Série';
+  const bgChip = media.type === 'movie' ? '#5065ff' : '#fe4c00';
+  const poster = media.poster
+    ? `<img src="${media.poster}" alt="${media.title}" loading="lazy" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-bottom:2px solid #000;">`
+    : `<div style="aspect-ratio:2/3;background:#fe4c00;display:flex;align-items:center;justify-content:center;border-bottom:2px solid #000;"><span class="material-symbols-outlined" style="font-size:3rem;color:#fff;font-variation-settings:'FILL' 1">movie</span></div>`;
+
+  return `
+    <article class="bg-white border-2 border-black cursor-pointer hover:-translate-y-1 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+      data-midia-id="${media.id}"
+      data-midia-tipo="${media.type}"
+      data-midia-titulo="${(media.title||'').replace(/"/g,'&quot;')}"
+      data-midia-poster="${media.poster || ''}"
+      data-midia-ano="${media.year || ''}"
+      data-midia-rating="${media.rating || ''}"
+      data-midia-overview="${(media.overview||'').replace(/"/g,'&quot;').slice(0,300)}"
+      tabindex="0" role="button" aria-label="Ver ${media.title}">
+      ${poster}
+      <div style="padding:0.75rem;">
+        <span style="font-size:0.65rem;font-weight:900;color:#fff;background:${bgChip};padding:2px 6px;border:1px solid #000;">${tipo}</span>
+        <h3 style="font-weight:700;font-size:0.9rem;line-height:1.2;margin:0.3rem 0 0.2rem;">${media.title}</h3>
+        ${media.year ? `<span style="font-size:0.7rem;font-weight:900;opacity:0.4;">${media.year}</span>` : ''}
+        ${media.rating ? `<span style="font-size:0.7rem;font-weight:700;margin-left:6px;opacity:0.6;">★ ${media.rating}</span>` : ''}
+      </div>
+    </article>`;
+}
+
+async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
+  previousScreen = Object.entries(screens).find(([, el]) => el?.classList.contains('active'))?.[0] || 'busca';
+  showScreen('midia');
+
+  document.getElementById('midia-titulo').textContent   = titulo || '–';
+  document.getElementById('midia-tipo-ano').textContent = `${tipo === 'movie' ? 'Filme' : 'Série'}${ano ? ' · ' + ano : ''}`;
+  document.getElementById('midia-rating').textContent   = rating ? `★ ${rating} / 10` : '–';
+  document.getElementById('midia-extra').textContent    = '–';
+  document.getElementById('midia-descricao').textContent = overview || 'Carregando sinopse…';
+  document.getElementById('midia-tags').innerHTML = '';
+  document.getElementById('midia-livros').innerHTML = '<p class="opacity-50 col-span-full text-sm">Buscando livros relacionados…</p>';
+
+  const posterWrap = document.getElementById('midia-poster-wrap');
+  if (poster) {
+    posterWrap.innerHTML = `<img src="${poster}" alt="${titulo}" style="width:100%;border:4px solid #000;box-shadow:12px 12px 0 0 #5065ff;" loading="lazy">`;
+  } else {
+    posterWrap.innerHTML = `<div class="book-icon-container bg-orange border-4 border-black shadow-[16px_16px_0px_0px_#5065ff]"><span class="material-symbols-outlined text-white text-8xl" style="font-variation-settings:'FILL' 1,'wght' 700">movie</span></div>`;
+  }
+
+  try {
+    const [detalhes, livros] = await Promise.allSettled([
+      getMediaDetails(Number(id), tipo),
+      searchBooks(titulo, 4),
+    ]);
+
+    if (detalhes.status === 'fulfilled') {
+      const d = detalhes.value;
+      if (d.overview) document.getElementById('midia-descricao').textContent = d.overview;
+      document.getElementById('midia-tmdb-link').href = d.tmdbUrl || '#';
+      if (d.runtime) document.getElementById('midia-extra').textContent = d.runtime;
+      if (d.seasons) document.getElementById('midia-extra').textContent = `${d.seasons} temporada(s)`;
+
+      const tagsEl = document.getElementById('midia-tags');
+      const cores = ['bg-orange text-white', 'bg-blue text-white', 'bg-yellow text-black'];
+      (d.genres || []).slice(0, 4).forEach((g, i) => {
+        const span = document.createElement('span');
+        span.className = `${cores[i % cores.length]} px-3 py-1 font-black text-xs uppercase border-2 border-black`;
+        span.textContent = g;
+        tagsEl.appendChild(span);
+      });
+    }
+
+    const livrosEl = document.getElementById('midia-livros');
+    if (livros.status === 'fulfilled' && livros.value.length > 0) {
+      livrosEl.innerHTML = livros.value.slice(0, 4).map(b => renderLivroCard(b)).join('');
+      livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
+        el.addEventListener('click', () => abrirLivro(
+          el.dataset.livroId, el.dataset.livroTitulo,
+          el.dataset.livroAutor, el.dataset.livroCover, el.dataset.livroAno
+        ));
+      });
+    } else {
+      livrosEl.innerHTML = '<p class="opacity-50 col-span-full text-sm">Nenhum livro relacionado encontrado.</p>';
+    }
+  } catch (err) {
+    console.error('Erro ao carregar mídia:', err);
+  }
+}
+
+// ─── Botão Voltar da página de mídia ────────────────────────
+document.getElementById('midia-back-btn')?.addEventListener('click', () => {
+  showScreen(previousScreen || 'busca');
+});
+
 async function abrirLivro(workId, titulo, autor, cover, ano) {
   previousScreen = Object.entries(screens).find(([, el]) => el?.classList.contains('active'))?.[0] || 'home';
   showScreen('livro');
