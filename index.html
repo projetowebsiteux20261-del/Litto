@@ -62,13 +62,12 @@
     .neo-border       { border: 2px solid #000; }
     .neo-border-thick { border: 4px solid #000; }
 
-    #screen-explorar, #screen-bibliotecas-digitais, #screen-fundacao,
+    #screen-explorar, #screen-bibliotecas-digitais,
     #screen-busca, #screen-livro, #screen-midia {
       display: none;
     }
     #screen-explorar.active,
     #screen-bibliotecas-digitais.active,
-    #screen-fundacao.active,
     #screen-busca.active,
     #screen-livro.active,
     #screen-midia.active {
@@ -304,22 +303,22 @@
             <h2 class="text-3xl font-black">Livros em Destaque</h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="fundacao">
+            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
               <div class="w-full aspect-[3/4] bg-yellow border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-black opacity-80">auto_stories</span></div>
               <h3 class="text-xl font-black mb-2">Dom Casmurro</h3><p class="text-gray-600 text-sm font-medium">Machado de Assis</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span></div>
             </div>
-            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="fundacao">
+            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
               <div class="w-full aspect-[3/4] bg-blue border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-white opacity-80">rocket_launch</span></div>
               <h3 class="text-xl font-black mb-2">Duna</h3><p class="text-gray-600 text-sm font-medium">Frank Herbert</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-gray-300">star</span></div>
             </div>
-            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="fundacao">
+            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
               <div class="w-full aspect-[3/4] bg-orange border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-black opacity-80">skull</span></div>
               <h3 class="text-xl font-black mb-2">O Iluminado</h3><p class="text-gray-600 text-sm font-medium">Stephen King</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span></div>
             </div>
-            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="fundacao">
+            <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
               <div class="w-full aspect-[3/4] bg-dark border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-white opacity-80">psychology</span></div>
               <h3 class="text-xl font-black mb-2">1984</h3><p class="text-gray-600 text-sm font-medium">George Orwell</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span></div>
@@ -582,95 +581,6 @@
     </section>
 
     <!-- ============================================================
-         TELA: FUNDAÇÃO (página exemplo de livro)
-    ============================================================ -->
-    <section id="screen-fundacao" class="screen" aria-label="Fundação – Isaac Asimov">
-      <div class="px-[5%] pb-20 relative overflow-hidden pt-8 max-w-7xl mx-auto">
-        <div class="absolute top-20 -left-20 w-[600px] h-[600px] bg-blue/10 rounded-full animate-pulse pointer-events-none" style="filter:blur(60px);opacity:0.5;"></div>
-
-        <section class="max-w-6xl mx-auto mb-32">
-          <div class="fundacao-form-card p-8 md:p-12 flex flex-col md:flex-row gap-12 items-start">
-            <div class="w-full md:w-1/3 shrink-0">
-              <div class="book-icon-container bg-blue border-4 border-black shadow-[16px_16px_0px_0px_#fe4c00]"><span class="material-symbols-outlined text-white text-8xl" style="font-variation-settings:'FILL' 1,'wght' 700">auto_stories</span></div>
-            </div>
-            <div class="flex-1 space-y-6">
-              <div>
-                <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="bg-yellow px-3 py-1 text-black font-black text-xs uppercase border-2 border-black">Sci-Fi Clássico</span>
-                  <span class="bg-blue px-3 py-1 text-white font-black text-xs uppercase border-2 border-black">Distopia</span>
-                  <span class="bg-orange px-3 py-1 text-white font-black text-xs uppercase border-2 border-black">Ficção Científica</span>
-                </div>
-                <h1 class="text-6xl font-extrabold leading-none tracking-tight mb-2">Fundação</h1>
-                <p class="text-2xl font-bold text-blue">Isaac Asimov</p>
-              </div>
-              <div class="flex gap-4 items-center">
-                <div class="flex text-yellow"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined">star_half</span></div>
-                <span class="font-bold opacity-70">4.8 (2.4k avaliações)</span>
-              </div>
-              <p class="text-lg leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t-2 border-black">
-                <div><p class="text-xs uppercase font-black opacity-50 mb-1">Páginas</p><p class="font-bold">240</p></div>
-                <div><p class="text-xs uppercase font-black opacity-50 mb-1">Idioma</p><p class="font-bold">Português (Traduzido)</p></div>
-                <div><p class="text-xs uppercase font-black opacity-50 mb-1">Ano</p><p class="font-bold">1951</p></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="max-w-6xl mx-auto mb-32 bg-blue/5 p-12 border-2 border-black shadow-[8px_8px_0px_0px_rgba(80,101,255,1)]">
-          <h2 class="text-4xl font-bold mb-2">Quem leu, também gostou</h2>
-          <p class="text-blue font-bold mb-12">Baseado nas suas preferências de Sci-Fi</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="fundacao-form-card bg-white p-4 flex flex-col h-full"><div class="book-icon-container bg-orange mb-4 border-2 border-black"><span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1">book</span></div><h3 class="font-bold text-xl mb-1">Duna</h3><p class="text-sm opacity-70 mb-4">Frank Herbert</p><span class="text-xs font-black bg-blue text-white px-3 py-1 border-2 border-black uppercase mt-auto">Space Opera</span></div>
-            <div class="fundacao-form-card bg-white p-4 flex flex-col h-full"><div class="book-icon-container bg-blue mb-4 border-2 border-black"><span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1">public</span></div><h3 class="font-bold text-xl mb-1">O Problema dos Três Corpos</h3><p class="text-sm opacity-70 mb-4">Cixin Liu</p><span class="text-xs font-black bg-orange text-white px-3 py-1 border-2 border-black uppercase mt-auto">Hard Sci-Fi</span></div>
-            <div class="fundacao-form-card bg-white p-4 flex flex-col h-full"><div class="book-icon-container bg-yellow mb-4 border-2 border-black"><span class="material-symbols-outlined text-black text-6xl" style="font-variation-settings:'FILL' 1">memory</span></div><h3 class="font-bold text-xl mb-1">Neuromancer</h3><p class="text-sm opacity-70 mb-4">William Gibson</p><span class="text-xs font-black bg-blue text-white px-3 py-1 border-2 border-black uppercase mt-auto">Cyberpunk</span></div>
-            <div class="fundacao-form-card bg-white p-4 flex flex-col h-full"><div class="book-icon-container bg-orange mb-4 border-2 border-black"><span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1">local_fire_department</span></div><h3 class="font-bold text-xl mb-1">Fahrenheit 451</h3><p class="text-sm opacity-70 mb-4">Ray Bradbury</p><span class="text-xs font-black bg-orange text-white px-3 py-1 border-2 border-black uppercase mt-auto">Distopia</span></div>
-          </div>
-        </section>
-
-        <section class="max-w-6xl mx-auto mb-32 p-12">
-          <h2 class="text-4xl font-bold mb-2">Recomendações da Comunidade</h2>
-          <p class="font-bold opacity-70 mb-12">Conexões entre páginas e telas</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="urec bg-white space-y-4"><h4 class="font-bold text-xl">Fundação</h4><p class="italic leading-relaxed text-lg">"Esse livro é perfeito para quem gostou da série Foundation da Apple TV+."</p><p class="text-xs font-black opacity-50 uppercase">Recomendado por @marcosscci</p></div>
-            <div class="urec bg-white space-y-4"><h4 class="font-bold text-xl">Duna</h4><p class="italic leading-relaxed text-lg">"Indispensável para quem ficou fascinado pelos filmes de Denis Villeneuve."</p><p class="text-xs font-black opacity-50 uppercase">Recomendado por @ana_books</p></div>
-          </div>
-        </section>
-
-        <section class="max-w-6xl mx-auto bg-orange/5 p-12 border-2 border-black shadow-[8px_8px_0px_0px_#fe4c00]">
-          <h2 class="text-4xl font-bold mb-2">Comentários da Comunidade</h2>
-          <p class="font-bold opacity-70 mb-12">O que os outros leitores estão dizendo</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="urec bg-white space-y-4">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-3"><div class="w-14 h-14 bg-blue rounded-full border-2 border-black flex items-center justify-center text-white font-black text-xl">AM</div><div><h4 class="font-bold text-xl leading-none">Arthur M.</h4><small class="text-xs opacity-50 uppercase font-black">Lido em Outubro 2023</small></div></div>
-                <div class="flex text-yellow"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span></div>
-              </div>
-              <p class="italic leading-relaxed text-lg">"Uma obra-prima absoluta. A forma como Asimov constrói o conceito de psico-história é fascinante e ainda parece muito atual."</p>
-              <button class="flex items-center gap-2 text-sm font-black border-2 border-black px-4 py-2 bg-yellow hover:bg-yellow/80"><span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">thumb_up</span> Útil (42)</button>
-            </div>
-            <div class="urec bg-white space-y-4">
-              <div class="flex justify-between items-start">
-                <div class="flex items-center gap-3"><div class="w-14 h-14 bg-orange rounded-full border-2 border-black flex items-center justify-center text-white font-black text-xl">CL</div><div><h4 class="font-bold text-xl leading-none">Clara Lima</h4><small class="text-xs opacity-50 uppercase font-black">Lido em Janeiro 2024</small></div></div>
-                <div class="flex text-yellow"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined">star</span></div>
-              </div>
-              <p class="italic leading-relaxed text-lg">"A leitura é bem rápida porque os contos são dinâmicos. No começo achei estranho os saltos temporais, mas depois você entende que o protagonista é a própria Fundação."</p>
-              <button class="flex items-center gap-2 text-sm font-black border-2 border-black px-4 py-2 bg-yellow hover:bg-yellow/80"><span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">thumb_up</span> Útil (18)</button>
-            </div>
-          </div>
-        </section>
-
-      </div>
-      <footer class="site-footer" role="contentinfo">
-        <div>
-          <span class="footer-logo">Litto Book Club.</span>
-          <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
-        </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
-      </footer>
-    </section>
-
-    <!-- ============================================================
          TELA: PERFIL
     ============================================================ -->
     <section id="screen-perfil" class="screen" aria-label="Perfil do usuário">
@@ -776,6 +686,5 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script type="module" src="js/app.js"></script>
-<link rel="stylesheet" href="css/apis-styles.css">
 </body>
 </html>
