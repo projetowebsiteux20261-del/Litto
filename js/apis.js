@@ -4,10 +4,10 @@
 //  • Filmes   → TMDB             (requer chave)
 // ============================================================
 
-const GOOGLE_BOOKS_KEY  = 'AIzaSyCqKuIQBlRptnWRtQYOuwVCX7JbQSoPL6M';
+import { GOOGLE_BOOKS_KEY, TMDB_API_KEY } from './config.js';
+
 const GOOGLE_BOOKS_BASE = 'https://www.googleapis.com/books/v1';
 
-const TMDB_API_KEY = '7dbf7128baf22521877136df552400b5';
 const TMDB_BASE    = 'https://api.themoviedb.org/3';
 const TMDB_IMG     = 'https://image.tmdb.org/t/p/w300';
 
