@@ -21,8 +21,6 @@ import {
   findAdaptations,
   getBookDetails,
   getMediaDetails,
-  renderBookCard,
-  renderMediaCard,
 } from './apis.js';
 
 // ─── Estado ─────────────────────────────────────────────────
@@ -37,7 +35,6 @@ const screens = {
   cadastro:               document.getElementById("screen-cadastro"),
   explorar:               document.getElementById("screen-explorar"),
   "bibliotecas-digitais": document.getElementById("screen-bibliotecas-digitais"),
-  fundacao:               document.getElementById("screen-fundacao"),
   busca:                  document.getElementById("screen-busca"),
   livro:                  document.getElementById("screen-livro"),
   midia:                  document.getElementById("screen-midia"),
