@@ -205,7 +205,8 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
       // Busca livros pelos gêneros do TMDB
       const livrosEl = document.getElementById('midia-livros');
       try {
-        const livros = await searchBooksByGenres(detalhes.genres || [], 8);
+        const generoQuery = (detalhes.genres || []).slice(0, 2).join(' ');
+        const livros = generoQuery ? await searchBooks(generoQuery, 8) : [];
         if (livros.length > 0) {
           livrosEl.innerHTML = livros.slice(0, 4).map(b => renderLivroCard(b)).join('');
           livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
