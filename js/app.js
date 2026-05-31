@@ -21,7 +21,6 @@ import {
   findAdaptations,
   getBookDetails,
   getMediaDetails,
-  searchBooksByGenres,
   renderBookCard,
   renderMediaCard,
 } from './apis.js';
