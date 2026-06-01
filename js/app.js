@@ -10,6 +10,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  sendPasswordResetEmail,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { collection, addDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -35,6 +36,7 @@ const screens = {
   perfil:                 document.getElementById("screen-perfil"),
   login:                  document.getElementById("screen-login"),
   cadastro:               document.getElementById("screen-cadastro"),
+  "recuperar-senha":      document.getElementById("screen-recuperar-senha"),
   explorar:               document.getElementById("screen-explorar"),
   "bibliotecas-digitais": document.getElementById("screen-bibliotecas-digitais"),
   busca:                  document.getElementById("screen-busca"),
@@ -631,6 +633,7 @@ function traduzirErroFirebase(code) {
     "auth/invalid-credential":     "E-mail ou senha incorretos.",
     "auth/too-many-requests":      "Muitas tentativas. Aguarde alguns minutos.",
     "auth/network-request-failed": "Erro de conexão. Verifique sua internet.",
+    "auth/missing-email":          "Informe um e-mail.",
   };
   return mapa[code] || "Erro inesperado. Tente novamente.";
 }
@@ -708,6 +711,39 @@ if (formLogin) {
       mostrarAlerta("login-alert", "error", traduzirErroFirebase(err.code));
     } finally {
       btn.disabled = false; btn.textContent = "Entrar";
+    }
+  });
+}
+
+// ─── Formulário de Recuperação de Senha ─────────────────────
+const formRecuperar = document.getElementById("form-recuperar-senha");
+if (formRecuperar) {
+  formRecuperar.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    esconderAlerta("recuperar-alert");
+    limparErroCampo("rec-email", "err-rec-email");
+
+    const email = document.getElementById("rec-email").value.trim();
+
+    if (!emailValido(email)) {
+      mostrarErroCampo("rec-email", "err-rec-email", "Informe um e-mail válido.");
+      return;
+    }
+
+    const btn = formRecuperar.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Enviando…";
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      mostrarAlerta("recuperar-alert", "success",
+        "E-mail enviado! Verifique sua caixa de entrada (e o spam).");
+      formRecuperar.reset();
+    } catch (err) {
+      mostrarAlerta("recuperar-alert", "error", traduzirErroFirebase(err.code));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Enviar link de recuperação";
     }
   });
 }
