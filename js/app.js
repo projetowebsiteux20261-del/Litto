@@ -47,20 +47,66 @@ let previousScreen = "home";
 
 // ─── Curiosidades rotativas ──────────────────────────────────
 const CURIOSIDADES = [
-  { titulo: 'Senhor dos Anéis', texto: 'J.R.R. Tolkien levou mais de 12 anos para escrever O Senhor dos Anéis. A trilogia foi publicada em 3 volumes entre 1954 e 1955 e transformou o gênero fantasia para sempre.' },
-  { titulo: 'Duna', texto: 'Frank Herbert pesquisou por 6 anos antes de escrever Duna. A obra foi rejeitada por 23 editoras antes de ser publicada em 1965 e se tornar o livro de ficção científica mais vendido da história.' },
-  { titulo: '1984', texto: 'George Orwell escreveu 1984 enquanto estava gravemente doente com tuberculose. O livro foi publicado em 1949 e cunhou termos como "Grande Irmão" e "Duplipensar" que usamos até hoje.' },
-  { titulo: 'Dom Casmurro', texto: 'Machado de Assis escreveu Dom Casmurro em 1899. A questão sobre a culpa ou inocência de Capitu gerou debates literários por mais de um século — e ainda não tem resposta definitiva.' },
-  { titulo: 'O Iluminado', texto: 'Stephen King escreveu O Iluminado em apenas alguns meses. O próprio King odiou a adaptação de Kubrick, dizendo que ela perdia a humanidade dos personagens.' },
+  {
+    titulo: 'O Senhor dos Anéis',
+    texto: 'J.R.R. Tolkien levou mais de 12 anos para escrever a trilogia. Ele criou idiomas inteiros, incluindo o Quenya e o Sindarin, antes de escrever uma única linha da história.',
+    icone: 'castle',
+    bg: '#5065ff',
+    badge: 'VOCÊ SABIA?',
+    badgeBg: '#ffdf2b', badgeColor: '#000',
+  },
+  {
+    titulo: 'Duna',
+    texto: 'Frank Herbert pesquisou por 6 anos antes de escrever Duna. A obra foi rejeitada por 23 editoras antes de ser publicada em 1965 e se tornar o livro de ficção científica mais vendido da história.',
+    icone: 'sunny',
+    bg: '#fe4c00',
+    badge: 'CURIOSIDADE',
+    badgeBg: '#ffdf2b', badgeColor: '#000',
+  },
+  {
+    titulo: '1984',
+    texto: 'George Orwell escreveu 1984 enquanto estava gravemente doente com tuberculose. Publicado em 1949, o livro cunhou termos como "Grande Irmão" e "Duplipensar" que usamos até hoje.',
+    icone: 'visibility',
+    bg: '#1a1b24',
+    badge: 'VOCÊ SABIA?',
+    badgeBg: '#ffdf2b', badgeColor: '#000',
+  },
+  {
+    titulo: 'Dom Casmurro',
+    texto: 'Machado de Assis escreveu Dom Casmurro em 1899. A questão sobre a culpa ou inocência de Capitu gerou debates literários por mais de um século — e ainda não tem resposta definitiva.',
+    icone: 'question_mark',
+    bg: '#ffdf2b',
+    badge: 'DEBATE ETERNO',
+    badgeBg: '#1a1b24', badgeColor: '#fff',
+  },
+  {
+    titulo: 'O Iluminado',
+    texto: 'Stephen King escreveu O Iluminado em poucos meses durante um período difícil de sua vida. Curiosamente, ele odiou a adaptação de Kubrick, dizendo que ela perdia a humanidade dos personagens.',
+    icone: 'skull',
+    bg: '#fe4c00',
+    badge: 'FATO ASSUSTADOR',
+    badgeBg: '#1a1b24', badgeColor: '#fff',
+  },
 ];
 let curiosidadeAtual = Math.floor(Math.random() * CURIOSIDADES.length);
 
 function renderCuriosidade(idx) {
   const c = CURIOSIDADES[idx];
-  const tituloEl = document.getElementById('curiosidade-titulo');
-  const textoEl  = document.getElementById('curiosidade-texto');
-  if (tituloEl) tituloEl.textContent = c.titulo;
-  if (textoEl)  textoEl.textContent  = c.texto;
+  const container = document.getElementById('curiosidade-container');
+  const tituloEl  = document.getElementById('curiosidade-titulo');
+  const textoEl   = document.getElementById('curiosidade-texto');
+  const iconeEl   = document.getElementById('curiosidade-icone');
+  const badgeEl   = document.getElementById('curiosidade-badge');
+
+  if (container) container.style.background = c.bg;
+  if (tituloEl)  tituloEl.textContent  = c.titulo;
+  if (textoEl)   textoEl.textContent   = c.texto;
+  if (iconeEl)   iconeEl.textContent   = c.icone;
+  if (badgeEl) {
+    badgeEl.textContent        = c.badge;
+    badgeEl.style.background   = c.badgeBg;
+    badgeEl.style.color        = c.badgeColor;
+  }
 }
 renderCuriosidade(curiosidadeAtual);
 
@@ -69,7 +115,45 @@ document.getElementById('proxima-curiosidade')?.addEventListener('click', () => 
   renderCuriosidade(curiosidadeAtual);
 });
 
-// ─── Filtros estáticos da tela de busca ─────────────────────
+// ─── Carrega capas do Explorar via API ──────────────────────
+async function carregarCapasExplorar() {
+  // Livros — Google Books
+  const livrosExplorar = [
+    { id: 'dom-casmurro', query: 'Dom Casmurro Machado de Assis' },
+    { id: 'duna',         query: 'Duna Frank Herbert' },
+    { id: 'iluminado',    query: 'O Iluminado Stephen King' },
+    { id: '1984',         query: '1984 George Orwell' },
+  ];
+  livrosExplorar.forEach(async ({ id, query }) => {
+    const el = document.getElementById(`cover-${id}`);
+    if (!el) return;
+    try {
+      const livros = await searchBooks(query, 1);
+      if (livros[0]?.cover) {
+        el.innerHTML = `<img src="${livros[0].cover}" alt="${query}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+      }
+    } catch(_) {}
+  });
+
+  // Filmes/Séries — TMDB poster direto pelo ID
+  const TMDB_IMG = 'https://image.tmdb.org/t/p/w300';
+  const TMDB_KEY = (await import('./apis.js').then(m => m).catch(() => null));
+  const midiaExplorar = [
+    { id: 'senhor-aneis', tmdbId: '120',   type: 'movie' },
+    { id: 'succession',   tmdbId: '79696', type: 'tv'    },
+    { id: 'pulp-fiction', tmdbId: '680',   type: 'movie' },
+  ];
+  midiaExplorar.forEach(async ({ id, tmdbId, type }) => {
+    const el = document.getElementById(`cover-${id}`);
+    if (!el) return;
+    try {
+      const details = await getMediaDetails(Number(tmdbId), type === 'movie' ? 'movie' : 'series');
+      if (details?.poster) {
+        el.innerHTML = `<img src="${details.poster}" alt="${id}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+      }
+    } catch(_) {}
+  });
+}
 document.getElementById('busca-filtros')?.addEventListener('click', e => {
   const btn = e.target.closest('.filtro-genre-btn');
   if (!btn) return;
@@ -313,6 +397,18 @@ async function abrirLivro(workId, titulo, autor, cover, ano) {
   document.getElementById('livro-tags').innerHTML = '';
   document.getElementById('livro-adaptacoes').innerHTML = '<p class="opacity-50 col-span-full text-sm">Buscando adaptações…</p>';
 
+  // Links "onde ler"
+  const tituloEnc = encodeURIComponent(`"${titulo}"`);
+  const tituloSimples = encodeURIComponent(titulo);
+  const lerBiblion = document.getElementById('ler-biblion');
+  const lerMec     = document.getElementById('ler-mec');
+  const lerDominio = document.getElementById('ler-dominio');
+  const lerOL      = document.getElementById('ler-openlibrary');
+  if (lerBiblion) lerBiblion.href = `https://www.google.com/search?q=${tituloEnc}+site:biblion.odilo.us`;
+  if (lerMec)     lerMec.href     = `https://www.google.com/search?q=${tituloEnc}+site:meclivros.mec.gov.br`;
+  if (lerDominio) lerDominio.href = `https://dominiopublico.mec.gov.br/pesquisa/PesquisaObraForm.jsp?co_autor=&tx_titulo=${encodeURIComponent(titulo)}`;
+  if (lerOL)      lerOL.href      = `https://openlibrary.org/search?q=${tituloSimples}`;
+
   // Capa
   const coverWrap = document.getElementById('livro-cover-wrap');
   if (cover) {
@@ -394,6 +490,7 @@ function showScreen(name) {
 
   if (name === "mapa") setTimeout(initMap, 100);
   if (name === "home") setTimeout(initMapHome, 200);
+  if (name === "explorar") carregarCapasExplorar();
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
