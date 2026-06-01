@@ -157,20 +157,20 @@
         </div>
       </div>
 
-      <div class="curiosity-section">
+      <div id="curiosidade-container" class="curiosity-section" style="transition: background 0.4s;">
         <div class="curiosity-inner">
           <div class="curiosity-visual" aria-hidden="true">
             <div class="curiosity-img-wrap">
               <span class="material-symbols-outlined curiosity-bg-icon">auto_stories</span>
-              <div class="curiosity-badge"><span class="material-symbols-outlined" style="font-size:7rem;color:var(--text);">castle</span></div>
+              <div class="curiosity-badge">
+                <span id="curiosidade-icone" class="material-symbols-outlined" style="font-size:7rem;color:var(--text);">castle</span>
+              </div>
             </div>
           </div>
           <div class="curiosity-text">
-            <span class="tag-badge" style="background:var(--secondary);color:var(--text);margin-bottom:1rem;display:inline-block;">VOCÊ SABIA?</span>
-            <h2 class="section-title" style="color:#fff;margin-bottom:1rem;">O Senhor dos Anéis</h2>
-            <p style="color:rgba(255,255,255,0.9);font-weight:500;font-size:1rem;line-height:1.7;margin-bottom:2rem;">
-              J.R.R. Tolkien escreveu a trilogia como uma única obra gigante. A adaptação de Peter Jackson é considerada uma das mais fiéis da literatura para o cinema.
-            </p>
+            <span id="curiosidade-badge" class="tag-badge" style="background:var(--secondary);color:var(--text);margin-bottom:1rem;display:inline-block;">VOCÊ SABIA?</span>
+            <h2 id="curiosidade-titulo" class="section-title" style="color:#fff;margin-bottom:1rem;">–</h2>
+            <p id="curiosidade-texto" style="color:rgba(255,255,255,0.9);font-weight:500;font-size:1rem;line-height:1.7;margin-bottom:2rem;">–</p>
             <div style="display:flex;gap:1rem;flex-wrap:wrap;">
               <button class="btn-primary" data-nav="mapa">Ver Bibliotecas</button>
               <button class="btn-secondary-inv" data-nav="cadastro">Criar Conta</button>
@@ -249,7 +249,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
@@ -272,7 +272,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
@@ -305,22 +305,22 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
             <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
-              <div class="w-full aspect-[3/4] bg-yellow border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-black opacity-80">auto_stories</span></div>
+              <div id="cover-dom-casmurro" class="w-full aspect-[3/4] bg-yellow border-2 border-black mb-6 flex items-center justify-center overflow-hidden" data-book-title="Dom Casmurro"><span class="material-symbols-outlined text-8xl text-black opacity-80">auto_stories</span></div>
               <h3 class="text-xl font-black mb-2">Dom Casmurro</h3><p class="text-gray-600 text-sm font-medium">Machado de Assis</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span></div>
             </div>
             <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
-              <div class="w-full aspect-[3/4] bg-blue border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-white opacity-80">rocket_launch</span></div>
+              <div id="cover-duna" class="w-full aspect-[3/4] bg-blue border-2 border-black mb-6 flex items-center justify-center overflow-hidden" data-book-title="Duna"><span class="material-symbols-outlined text-8xl text-white opacity-80">rocket_launch</span></div>
               <h3 class="text-xl font-black mb-2">Duna</h3><p class="text-gray-600 text-sm font-medium">Frank Herbert</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-gray-300">star</span></div>
             </div>
             <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
-              <div class="w-full aspect-[3/4] bg-orange border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-black opacity-80">skull</span></div>
+              <div id="cover-iluminado" class="w-full aspect-[3/4] bg-orange border-2 border-black mb-6 flex items-center justify-center overflow-hidden" data-book-title="O Iluminado"><span class="material-symbols-outlined text-8xl text-black opacity-80">skull</span></div>
               <h3 class="text-xl font-black mb-2">O Iluminado</h3><p class="text-gray-600 text-sm font-medium">Stephen King</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span></div>
             </div>
             <div class="bg-white border-2 border-black p-6 card-hover transition-all flex flex-col items-center text-center cursor-pointer" data-nav="busca">
-              <div class="w-full aspect-[3/4] bg-dark border-2 border-black mb-6 flex items-center justify-center overflow-hidden"><span class="material-symbols-outlined text-8xl text-white opacity-80">psychology</span></div>
+              <div id="cover-1984" class="w-full aspect-[3/4] bg-dark border-2 border-black mb-6 flex items-center justify-center overflow-hidden" data-book-title="1984"><span class="material-symbols-outlined text-8xl text-white opacity-80">psychology</span></div>
               <h3 class="text-xl font-black mb-2">1984</h3><p class="text-gray-600 text-sm font-medium">George Orwell</p>
               <div class="mt-4 flex gap-1"><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span><span class="material-symbols-outlined text-yellow" style="font-variation-settings:'FILL' 1">star</span></div>
             </div>
@@ -334,15 +334,15 @@
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             <div class="bg-white border-2 border-black p-4 card-hover transition-all flex gap-6 cursor-pointer">
-              <div class="w-32 h-32 bg-yellow border-2 border-black flex-shrink-0 flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-black">theaters</span></div>
+              <div id="cover-senhor-aneis" class="w-32 h-32 bg-yellow border-2 border-black flex-shrink-0 flex items-center justify-center overflow-hidden" data-tmdb-id="120543" data-tmdb-type="movie"><span class="material-symbols-outlined text-5xl text-black">theaters</span></div>
               <div class="flex flex-col justify-center"><span class="font-black text-[10px] text-orange mb-1 uppercase tracking-widest">FILME</span><h3 class="text-lg font-black leading-tight mb-2">O Senhor dos Anéis</h3><p class="font-medium text-sm text-gray-500">Uma jornada épica pela Terra Média.</p></div>
             </div>
             <div class="bg-white border-2 border-black p-4 card-hover transition-all flex gap-6 cursor-pointer">
-              <div class="w-32 h-32 bg-blue border-2 border-black flex-shrink-0 flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-white">live_tv</span></div>
+              <div id="cover-succession" class="w-32 h-32 bg-blue border-2 border-black flex-shrink-0 flex items-center justify-center overflow-hidden" data-tmdb-id="79696" data-tmdb-type="tv"><span class="material-symbols-outlined text-5xl text-white">live_tv</span></div>
               <div class="flex flex-col justify-center"><span class="font-black text-[10px] text-blue mb-1 uppercase tracking-widest">SÉRIE</span><h3 class="text-lg font-black leading-tight mb-2">Succession</h3><p class="font-medium text-sm text-gray-500">A luta pelo poder em uma dinastia de mídia.</p></div>
             </div>
             <div class="bg-white border-2 border-black p-4 card-hover transition-all flex gap-6 cursor-pointer">
-              <div class="w-32 h-32 bg-dark border-2 border-black flex-shrink-0 flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-white">confirmation_number</span></div>
+              <div id="cover-pulp-fiction" class="w-32 h-32 bg-dark border-2 border-black flex-shrink-0 flex items-center justify-center overflow-hidden" data-tmdb-id="680" data-tmdb-type="movie"><span class="material-symbols-outlined text-5xl text-white">confirmation_number</span></div>
               <div class="flex flex-col justify-center"><span class="font-black text-[10px] text-yellow mb-1 uppercase tracking-widest">FILME</span><h3 class="text-lg font-black leading-tight mb-2">Pulp Fiction</h3><p class="font-medium text-sm text-gray-500">Vidas de criminosos se entrelaçam em histórias.</p></div>
             </div>
           </div>
@@ -377,7 +377,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
@@ -444,7 +444,7 @@
       <span class="footer-logo">Litto Book Club.</span>
       <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
     </div>
-    <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+    
   </footer>
 </section>
     
@@ -582,7 +582,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
@@ -638,7 +638,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
@@ -679,6 +679,31 @@
           </div>
         </section>
 
+        <!-- Onde ler -->
+        <section class="max-w-6xl mx-auto mb-10 p-8 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-2xl font-black mb-2 uppercase">Onde Ler Gratuitamente</h2>
+          <p class="font-semibold opacity-60 mb-6 text-sm">Pesquise este livro nas plataformas abaixo</p>
+          <div class="flex flex-wrap gap-3">
+            <a id="ler-biblion" href="#" target="_blank" rel="noopener"
+               class="flex items-center gap-2 font-black text-sm px-4 py-3 border-2 border-black bg-blue text-white hover:-translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">phone_iphone</span> Biblion
+            </a>
+            <a id="ler-mec" href="#" target="_blank" rel="noopener"
+               class="flex items-center gap-2 font-black text-sm px-4 py-3 border-2 border-black bg-yellow text-black hover:-translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">school</span> MEC Livros
+            </a>
+            <a id="ler-dominio" href="#" target="_blank" rel="noopener"
+               class="flex items-center gap-2 font-black text-sm px-4 py-3 border-2 border-black bg-dark text-white hover:-translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">balance</span> Domínio Público
+            </a>
+            <a id="ler-openlibrary" href="#" target="_blank" rel="noopener"
+               class="flex items-center gap-2 font-black text-sm px-4 py-3 border-2 border-black bg-orange text-white hover:-translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">public</span> Open Library
+            </a>
+          </div>
+        </section>
+
+        <!-- Adaptações -->
         <section class="max-w-6xl mx-auto mb-16 bg-blue/5 p-10 border-2 border-black shadow-[8px_8px_0px_0px_rgba(80,101,255,1)]">
           <h2 class="text-3xl font-bold mb-2">Adaptações para o Cinema &amp; TV</h2>
           <p class="text-blue font-bold mb-8">Conexão entre páginas e telas</p>
@@ -693,7 +718,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
@@ -749,7 +774,7 @@
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        <div class="footer-links"><span>Sobre</span><span>Contato</span></div>
+        
       </footer>
     </section>
 
