@@ -1,5 +1,7 @@
 {
+  "version": 2,
   "buildCommand": "bash build.sh",
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "installCommand": ""
 }
