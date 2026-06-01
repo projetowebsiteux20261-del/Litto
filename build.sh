@@ -1,5 +1,5 @@
 #!/bin/bash
-cat > js/js/firebase-config-values.js << CONF
+cat > js/firebase-config-values.js << CONF
 export const firebaseConfig = {
   apiKey:            "${FIREBASE_API_KEY}",
   authDomain:        "${FIREBASE_AUTH_DOMAIN}",
