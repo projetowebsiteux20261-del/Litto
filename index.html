@@ -143,12 +143,12 @@
               <h3 class="benefit-title">Das Telas para as Páginas</h3>
               <p class="benefit-body">Conectamos os sucessos do cinema e das séries com as obras literárias que os inspiraram.</p>
             </article>
-            <article class="benefit-card" style="box-shadow:8px 8px 0px 0px #5065ff;">
+            <article class="benefit-card" style="box-shadow:8px 8px 0px 0px #fe4c00;">
               <div class="benefit-icon" style="background:var(--primary);"><span class="material-symbols-outlined" aria-hidden="true">menu_book</span></div>
               <h3 class="benefit-title">Curadoria Especializada</h3>
               <p class="benefit-body">Nossa equipe seleciona títulos que dialogam com a cultura pop atual.</p>
             </article>
-            <article class="benefit-card" style="box-shadow:8px 8px 0px 0px #ffdf2b;">
+            <article class="benefit-card" style="box-shadow:8px 8px 0px 0px #fe4c00;">
               <div class="benefit-icon" style="background:var(--text);"><span class="material-symbols-outlined" aria-hidden="true">diversity_3</span></div>
               <h3 class="benefit-title">Clube de Comunidade</h3>
               <p class="benefit-body">Participe de discussões profundas com leitores apaixonados por histórias.</p>
@@ -174,6 +174,7 @@
             <div style="display:flex;gap:1rem;flex-wrap:wrap;">
               <button class="btn-primary" data-nav="mapa">Ver Bibliotecas</button>
               <button class="btn-secondary-inv" data-nav="cadastro">Criar Conta</button>
+              <button id="proxima-curiosidade" class="btn-secondary-inv" type="button">Próxima curiosidade →</button>
             </div>
           </div>
         </div>
@@ -183,12 +184,12 @@
         <div style="max-width:1200px;margin:0 auto;">
           <h2 class="section-title" style="margin-bottom:2rem;">Sugestões para sua Estante</h2>
           <div class="genres-grid">
-            <div class="genre-card" style="background:var(--tertiary);color:#fff;" tabindex="0" role="button" aria-label="Fantasia épica"><span class="material-symbols-outlined genre-icon" aria-hidden="true">castle</span><p class="genre-label">FANTASIA ÉPICA</p></div>
-            <div class="genre-card" style="background:var(--primary);color:#fff;" tabindex="0" role="button" aria-label="Sci-Fi clássico"><span class="material-symbols-outlined genre-icon" aria-hidden="true">rocket_launch</span><p class="genre-label">SCI-FI CLASSIC</p></div>
-            <div class="genre-card" style="background:var(--secondary);color:var(--text);" tabindex="0" role="button" aria-label="Romance histórico"><span class="material-symbols-outlined genre-icon" aria-hidden="true">history_edu</span><p class="genre-label">ROMANCE HISTÓRICO</p></div>
-            <div class="genre-card" style="background:var(--surface);color:var(--text);border:2px solid var(--border);" tabindex="0" role="button" aria-label="Policial e mistério"><span class="material-symbols-outlined genre-icon" style="color:var(--tertiary);" aria-hidden="true">detector</span><p class="genre-label">POLICIAL &amp; MISTÉRIO</p></div>
-            <div class="genre-card" style="background:var(--tertiary);color:#fff;" tabindex="0" role="button" aria-label="Natureza e ensaio"><span class="material-symbols-outlined genre-icon" aria-hidden="true">emoji_nature</span><p class="genre-label">NATUREZA &amp; ENSAIO</p></div>
-            <div class="genre-card" style="background:var(--primary);color:#fff;" tabindex="0" role="button" aria-label="Filosofia moderna"><span class="material-symbols-outlined genre-icon" aria-hidden="true">psychology_alt</span><p class="genre-label">FILOSOFIA MODERNA</p></div>
+            <div class="genre-card" style="background:var(--tertiary);color:#fff;" tabindex="0" role="button" aria-label="Fantasia épica" data-genre="Fantasia"><span class="material-symbols-outlined genre-icon" aria-hidden="true">castle</span><p class="genre-label">FANTASIA ÉPICA</p></div>
+            <div class="genre-card" style="background:var(--primary);color:#fff;" tabindex="0" role="button" aria-label="Sci-Fi clássico" data-genre="Ficção científica"><span class="material-symbols-outlined genre-icon" aria-hidden="true">rocket_launch</span><p class="genre-label">SCI-FI CLASSIC</p></div>
+            <div class="genre-card" style="background:var(--secondary);color:var(--text);" tabindex="0" role="button" aria-label="Romance histórico" data-genre="História"><span class="material-symbols-outlined genre-icon" aria-hidden="true">history_edu</span><p class="genre-label">ROMANCE HISTÓRICO</p></div>
+            <div class="genre-card" style="background:var(--surface);color:var(--text);border:2px solid var(--border);" tabindex="0" role="button" aria-label="Policial e mistério" data-genre="Mistério"><span class="material-symbols-outlined genre-icon" style="color:var(--tertiary);" aria-hidden="true">detector</span><p class="genre-label">POLICIAL &amp; MISTÉRIO</p></div>
+            <div class="genre-card" style="background:var(--tertiary);color:#fff;" tabindex="0" role="button" aria-label="Natureza e ensaio" data-genre="Drama"><span class="material-symbols-outlined genre-icon" aria-hidden="true">emoji_nature</span><p class="genre-label">NATUREZA &amp; ENSAIO</p></div>
+            <div class="genre-card" style="background:var(--primary);color:#fff;" tabindex="0" role="button" aria-label="Filosofia moderna" data-genre="Drama"><span class="material-symbols-outlined genre-icon" aria-hidden="true">psychology_alt</span><p class="genre-label">FILOSOFIA MODERNA</p></div>
           </div>
         </div>
       </div>
@@ -291,9 +292,9 @@
             </div>
           </div>
           <div class="flex justify-center gap-4 mt-8">
-            <span class="font-bold text-xs bg-yellow text-black border-2 border-black px-4 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">#Suspense</span>
-            <span class="font-bold text-xs bg-blue text-white border-2 border-black px-4 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">#Sci-Fi</span>
-            <span class="font-bold text-xs bg-orange text-white border-2 border-black px-4 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">#Clássicos</span>
+            <span class="font-bold text-xs bg-yellow text-black border-2 border-black px-4 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" data-genre="Thriller" role="button" tabindex="0" style="cursor:pointer;">#Suspense</span>
+            <span class="font-bold text-xs bg-blue text-white border-2 border-black px-4 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" data-genre="Ficção científica" role="button" tabindex="0" style="cursor:pointer;">#Sci-Fi</span>
+            <span class="font-bold text-xs bg-orange text-white border-2 border-black px-4 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" data-genre="Drama" role="button" tabindex="0" style="cursor:pointer;">#Clássicos</span>
           </div>
         </section>
 
@@ -400,6 +401,31 @@
       </button>
     </div>
 
+    <!-- Filtros -->
+    <div id="busca-filtros" style="margin-bottom:2rem;">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;align-items:center;">
+        <span style="font-size:11px;font-weight:700;opacity:0.5;text-transform:uppercase;letter-spacing:.05em;">Gênero</span>
+        <button class="filtro-genre-btn" data-genre-id="" aria-pressed="true" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#ffdf2b;cursor:pointer;">Todos</button>
+        <button class="filtro-genre-btn" data-genre-id="28"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Ação</button>
+        <button class="filtro-genre-btn" data-genre-id="12"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Aventura</button>
+        <button class="filtro-genre-btn" data-genre-id="35"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Comédia</button>
+        <button class="filtro-genre-btn" data-genre-id="80"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Crime</button>
+        <button class="filtro-genre-btn" data-genre-id="18"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Drama</button>
+        <button class="filtro-genre-btn" data-genre-id="14"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Fantasia</button>
+        <button class="filtro-genre-btn" data-genre-id="27"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Terror</button>
+        <button class="filtro-genre-btn" data-genre-id="9648" aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Mistério</button>
+        <button class="filtro-genre-btn" data-genre-id="878"  aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Sci-Fi</button>
+        <button class="filtro-genre-btn" data-genre-id="53"   aria-pressed="false" style="font-size:11px;font-weight:700;padding:4px 12px;border:2px solid #000;background:#fff;cursor:pointer;">Thriller</button>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <label for="filtro-ano" style="font-size:11px;font-weight:700;opacity:0.5;text-transform:uppercase;">Ano</label>
+          <input id="filtro-ano" type="number" min="1900" max="2026" placeholder="Ex: 2023"
+            style="border:2px solid #000;padding:6px 10px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;width:120px;outline:none;" />
+        </div>
+      </div>
+    </div>
+
     <!-- Resultados: Filmes & Séries -->
     <section aria-labelledby="resultado-midia-h">
       <div class="flex items-center gap-3 mb-6">
@@ -434,16 +460,107 @@
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <article class="md:col-span-8 bg-blue p-8 border-4 border-black neo-brutal-shadow flex flex-col md:flex-row gap-8 items-center text-white">
-            <div class="w-full md:w-1/3 flex-shrink-0"><div class="aspect-square border-4 border-black bg-yellow flex items-center justify-center neo-brutal-shadow"><span class="material-symbols-outlined text-8xl text-black" style="font-variation-settings:'FILL' 1">auto_stories</span></div></div>
-            <div><h2 class="text-3xl font-black mb-4 uppercase">PROJECT GUTENBERG</h2><p class="font-medium text-white/90">A biblioteca digital mais antiga do mundo, com mais de 70.000 e-books gratuitos. Foco em obras clássicas cujo direito autoral expirou.</p></div>
+
+          <!-- Bibliotecas Digitais Gratuitas -->
+          <div class="md:col-span-12 mb-2">
+            <h2 class="text-2xl font-black uppercase border-l-4 border-blue pl-4">Leitura Digital Gratuita</h2>
+          </div>
+
+          <article class="md:col-span-6 bg-blue p-8 border-4 border-black neo-brutal-shadow text-white flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl" style="font-variation-settings:'FILL' 1">phone_iphone</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">Biblion</h3>
+              <p class="font-medium text-white/90 mb-4">Plataforma brasileira com e-books e audiobooks gratuitos. Disponível via app — basta ter cadastro em uma biblioteca pública parceira.</p>
+              <a href="https://biblion.odilo.us" target="_blank" rel="noopener"
+                class="inline-block bg-white text-blue font-black text-sm px-4 py-2 border-2 border-black hover:bg-yellow hover:text-black transition-all">
+                Acessar Biblion →
+              </a>
+            </div>
           </article>
-          <article class="md:col-span-4 bg-yellow p-8 border-4 border-black neo-brutal-shadow text-black"><span class="material-symbols-outlined text-5xl mb-4 block" style="font-variation-settings:'FILL' 1">menu_book</span><h2 class="text-2xl font-black mb-4 uppercase">Open Library</h2><p class="font-semibold">Projeto da Internet Archive com milhões de títulos para empréstimo digital.</p></article>
-          <article class="md:col-span-4 bg-orange p-8 border-4 border-black neo-brutal-shadow text-white"><span class="material-symbols-outlined text-5xl mb-4 block" style="font-variation-settings:'FILL' 1">museum</span><h2 class="text-2xl font-black mb-4 uppercase">Europeana</h2><p class="font-semibold text-white/90">Patrimônio cultural europeu com milhões de itens digitais.</p></article>
-          <article class="md:col-span-4 bg-white p-8 border-4 border-black neo-brutal-shadow text-black"><span class="material-symbols-outlined text-5xl mb-4 text-blue block" style="font-variation-settings:'FILL' 1">account_balance</span><h2 class="text-2xl font-black mb-4 uppercase">LIBRARY OF CONGRESS</h2><p class="font-semibold">A maior biblioteca do mundo, com mapas raros, fotos históricas e jornais antigos.</p></article>
-          <article class="md:col-span-4 bg-dark p-8 border-4 border-black neo-brutal-shadow text-white"><h2 class="text-2xl font-black mb-4 uppercase">BIBLIOTECAS PÚBLICAS</h2><p class="font-semibold opacity-80">Descubra como acessar redes de bibliotecas locais e empréstimo digital na sua região.</p></article>
-          <article class="md:col-span-6 bg-yellow p-8 border-4 border-black neo-brutal-shadow text-black"><h2 class="text-3xl font-black mb-6 uppercase">BIBLIOTECAS NACIONAIS</h2><div class="space-y-6"><div><h3 class="text-xl font-black uppercase mb-1">Biblion</h3><p class="font-semibold">A biblioteca digital gratuita de São Paulo, com e-books e audiobooks via aplicativo.</p></div><div><h3 class="text-xl font-black uppercase mb-1">MEC Livros</h3><p class="font-semibold">Iniciativa do Ministério da Educação com obras em formatos adaptados.</p></div></div></article>
-          <article class="md:col-span-6 bg-white p-8 border-4 border-black neo-brutal-shadow text-black"><h2 class="text-3xl font-black mb-4 uppercase">Standard Ebooks</h2><p class="text-lg font-semibold">Obras de domínio público formatadas com perfeição para e-readers modernos. Tipografia refinada e capas artísticas gratuitas.</p></article>
+
+          <article class="md:col-span-6 bg-yellow p-8 border-4 border-black neo-brutal-shadow text-black flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl" style="font-variation-settings:'FILL' 1">school</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">MEC Livros</h3>
+              <p class="font-semibold mb-4">Acervo do Ministério da Educação com obras em acesso aberto. Foco em literatura educacional, didática e obras de referência.</p>
+              <a href="https://meclivros.mec.gov.br" target="_blank" rel="noopener"
+                class="inline-block bg-black text-white font-black text-sm px-4 py-2 border-2 border-black hover:bg-blue hover:text-white transition-all">
+                Acessar MEC Livros →
+              </a>
+            </div>
+          </article>
+
+          <article class="md:col-span-8 bg-dark p-8 border-4 border-black neo-brutal-shadow text-white flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl" style="font-variation-settings:'FILL' 1">balance</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">Domínio Público</h3>
+              <p class="font-medium text-white/90 mb-4">Portal do MEC com obras nacionais cujos direitos autorais expiraram — Machado de Assis, José de Alencar, Eça de Queirós e muito mais. Download gratuito e legal.</p>
+              <a href="https://dominiopublico.mec.gov.br/pesquisa/PesquisaObraForm.jsp" target="_blank" rel="noopener"
+                class="inline-block bg-white text-black font-black text-sm px-4 py-2 border-2 border-black hover:bg-orange hover:text-white transition-all">
+                Pesquisar obras →
+              </a>
+            </div>
+          </article>
+
+          <article class="md:col-span-4 bg-orange p-8 border-4 border-black neo-brutal-shadow text-white flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl" style="font-variation-settings:'FILL' 1">public</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">Open Library</h3>
+              <p class="font-semibold text-white/90 mb-4">Projeto da Internet Archive com milhões de títulos para empréstimo digital. Acervo global com obras em português.</p>
+              <a href="https://openlibrary.org" target="_blank" rel="noopener"
+                class="inline-block bg-white text-orange font-black text-sm px-4 py-2 border-2 border-black hover:bg-yellow hover:text-black transition-all">
+                Acessar Open Library →
+              </a>
+            </div>
+          </article>
+
+          <!-- Sebo -->
+          <div class="md:col-span-12 mt-6 mb-2">
+            <h2 class="text-2xl font-black uppercase border-l-4 border-orange pl-4">Comprar Usado</h2>
+          </div>
+
+          <article class="md:col-span-6 bg-white p-8 border-4 border-black neo-brutal-shadow text-black flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl text-orange" style="font-variation-settings:'FILL' 1">storefront</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">Estante Virtual</h3>
+              <p class="font-semibold mb-4">O maior marketplace de livros usados do Brasil. Encontre sebos de todo o país com ótimos preços e raridades difíceis de achar.</p>
+              <a href="https://www.estantevirtual.com.br" target="_blank" rel="noopener"
+                class="inline-block bg-orange text-white font-black text-sm px-4 py-2 border-2 border-black hover:bg-black transition-all">
+                Buscar livros usados →
+              </a>
+            </div>
+          </article>
+
+          <!-- Bibliotecas SP (presencial) -->
+          <div class="md:col-span-12 mt-6 mb-2">
+            <h2 class="text-2xl font-black uppercase border-l-4 border-yellow pl-4">Empréstimo Presencial — São Paulo</h2>
+            <p class="text-sm font-semibold opacity-60 mt-1">Pesquise o catálogo online e retire o livro na biblioteca mais próxima.</p>
+          </div>
+
+          <article class="md:col-span-6 bg-yellow p-8 border-4 border-black neo-brutal-shadow text-black flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl" style="font-variation-settings:'FILL' 1">local_library</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">Biblioteca Circula SP</h3>
+              <p class="font-semibold mb-4">Catálogo unificado das bibliotecas municipais de São Paulo. Pesquise por título, autor ou assunto e veja em qual unidade o livro está disponível para retirada.</p>
+              <a href="https://bibliotecacircula.prefeitura.sp.gov.br/pesquisa/" target="_blank" rel="noopener"
+                class="inline-block bg-black text-white font-black text-sm px-4 py-2 border-2 border-black hover:bg-blue hover:text-white transition-all">
+                Pesquisar catálogo →
+              </a>
+            </div>
+          </article>
+
+          <article class="md:col-span-6 bg-white p-8 border-4 border-black neo-brutal-shadow text-black flex flex-col gap-4">
+            <span class="material-symbols-outlined text-5xl text-blue" style="font-variation-settings:'FILL' 1">account_balance</span>
+            <div>
+              <h3 class="text-2xl font-black mb-2 uppercase">Acervo Biblioteca de SP</h3>
+              <p class="font-semibold mb-4">Acervo da Biblioteca de São Paulo, uma das maiores do país. Pesquise o catálogo completo e consulte a disponibilidade para empréstimo presencial.</p>
+              <a href="https://acervo.bibliotecadesaopaulo.org.br/bnportal/m/pt-BR/search?exp_default=%5EBDS%2FTIPO" target="_blank" rel="noopener"
+                class="inline-block bg-blue text-white font-black text-sm px-4 py-2 border-2 border-black hover:bg-black transition-all">
+                Pesquisar acervo →
+              </a>
+            </div>
+          </article>
+
         </div>
 
         <section class="mt-20 p-12 bg-white border-4 border-black neo-brutal-shadow grid md:grid-cols-2 gap-12 items-center">
