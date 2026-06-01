@@ -18,6 +18,8 @@ import { initMap, initMapHome } from "./mapa.js";
 import {
   searchBooks,
   searchMedia,
+  searchMediaWithFilters,
+  searchBooksByGenres,
   findAdaptations,
   getBookDetails,
   getMediaDetails,
@@ -42,6 +44,70 @@ const screens = {
 
 // ─── Histórico de navegação (para o botão Voltar do livro) ───
 let previousScreen = "home";
+
+// ─── Curiosidades rotativas ──────────────────────────────────
+const CURIOSIDADES = [
+  { titulo: 'Senhor dos Anéis', texto: 'J.R.R. Tolkien levou mais de 12 anos para escrever O Senhor dos Anéis. A trilogia foi publicada em 3 volumes entre 1954 e 1955 e transformou o gênero fantasia para sempre.' },
+  { titulo: 'Duna', texto: 'Frank Herbert pesquisou por 6 anos antes de escrever Duna. A obra foi rejeitada por 23 editoras antes de ser publicada em 1965 e se tornar o livro de ficção científica mais vendido da história.' },
+  { titulo: '1984', texto: 'George Orwell escreveu 1984 enquanto estava gravemente doente com tuberculose. O livro foi publicado em 1949 e cunhou termos como "Grande Irmão" e "Duplipensar" que usamos até hoje.' },
+  { titulo: 'Dom Casmurro', texto: 'Machado de Assis escreveu Dom Casmurro em 1899. A questão sobre a culpa ou inocência de Capitu gerou debates literários por mais de um século — e ainda não tem resposta definitiva.' },
+  { titulo: 'O Iluminado', texto: 'Stephen King escreveu O Iluminado em apenas alguns meses. O próprio King odiou a adaptação de Kubrick, dizendo que ela perdia a humanidade dos personagens.' },
+];
+let curiosidadeAtual = Math.floor(Math.random() * CURIOSIDADES.length);
+
+function renderCuriosidade(idx) {
+  const c = CURIOSIDADES[idx];
+  const tituloEl = document.getElementById('curiosidade-titulo');
+  const textoEl  = document.getElementById('curiosidade-texto');
+  if (tituloEl) tituloEl.textContent = c.titulo;
+  if (textoEl)  textoEl.textContent  = c.texto;
+}
+renderCuriosidade(curiosidadeAtual);
+
+document.getElementById('proxima-curiosidade')?.addEventListener('click', () => {
+  curiosidadeAtual = (curiosidadeAtual + 1) % CURIOSIDADES.length;
+  renderCuriosidade(curiosidadeAtual);
+});
+
+// ─── Filtros estáticos da tela de busca ─────────────────────
+document.getElementById('busca-filtros')?.addEventListener('click', e => {
+  const btn = e.target.closest('.filtro-genre-btn');
+  if (!btn) return;
+  document.querySelectorAll('.filtro-genre-btn').forEach(b => {
+    b.setAttribute('aria-pressed', 'false');
+    b.style.background = '#fff';
+  });
+  btn.setAttribute('aria-pressed', 'true');
+  btn.style.background = '#ffdf2b';
+  const q = document.getElementById('busca-input')?.value?.trim() || '';
+  realizarBusca(q);
+});
+
+document.getElementById('filtro-ano')?.addEventListener('change', () => {
+  const q = document.getElementById('busca-input')?.value?.trim() || '';
+  realizarBusca(q);
+});
+
+// ─── Cards de gênero da home ativam filtro na busca ─────────
+document.querySelectorAll('[data-genre]').forEach(el => {
+  el.addEventListener('click', () => {
+    const genreName = el.dataset.genre;
+    const genreMap = { 'Fantasia': 14, 'Ficção científica': 878, 'História': 36, 'Mistério': 9648, 'Drama': 18, 'Thriller': 53, 'Ação': 28, 'Terror': 27 };
+    const gId = genreMap[genreName];
+    document.querySelectorAll('.filtro-genre-btn').forEach(b => {
+      b.setAttribute('aria-pressed', 'false');
+      b.style.background = '#fff';
+    });
+    if (gId) {
+      const matchBtn = document.querySelector(`.filtro-genre-btn[data-genre-id="${gId}"]`);
+      if (matchBtn) { matchBtn.setAttribute('aria-pressed', 'true'); matchBtn.style.background = '#ffdf2b'; }
+    }
+    const buscaInput = document.getElementById('busca-input');
+    if (buscaInput) buscaInput.value = '';
+    showScreen('busca');
+    realizarBusca('');
+  });
+});
 
 // ─── Pesquisa (home e explorar) ──────────────────────────────
 function executarBusca(origem) {
@@ -84,15 +150,21 @@ async function realizarBusca(query) {
   const midiaEl = document.getElementById("busca-midia");
   if (midiaEl) midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Buscando filmes e séries…</p>';
 
-  const midiaResult = await Promise.allSettled([searchMedia(query, 12)]);
-  const resultado = midiaResult[0];
+  const activeBtn = document.querySelector('.filtro-genre-btn[aria-pressed="true"]');
+  const genreId = activeBtn?.dataset.genreId !== '' ? (Number(activeBtn?.dataset.genreId) || null) : null;
+  const ano = document.getElementById('filtro-ano')?.value?.trim() || null;
+
+  const resultado = await Promise.allSettled([
+    searchMediaWithFilters({ query: query || '', genreId, year: ano, limit: 12 })
+  ]);
 
   if (midiaEl) {
-    if (resultado.status === 'rejected') {
-      console.error('Erro mídia:', resultado.reason);
+    if (resultado[0].status === 'rejected') {
+      console.error('Erro mídia:', resultado[0].reason);
       midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Erro ao buscar filmes/séries.</p>';
     } else {
-      const todos = [...(resultado.value.movies || []), ...(resultado.value.series || [])];
+      const { movies = [], series = [] } = resultado[0].value;
+      const todos = [...movies, ...series];
       if (todos.length === 0) {
         midiaEl.innerHTML = '<p class="opacity-50 text-sm col-span-full">Nenhuma mídia encontrada.</p>';
       } else {
@@ -199,11 +271,10 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
         tagsEl.appendChild(span);
       });
 
-      // Busca livros pelos gêneros do TMDB
+      // Busca livros pelos gêneros do TMDB via Google Books
       const livrosEl = document.getElementById('midia-livros');
       try {
-        const generoQuery = (detalhes.genres || []).slice(0, 2).join(' ');
-        const livros = generoQuery ? await searchBooks(generoQuery, 8) : [];
+        const livros = await searchBooksByGenres(detalhes.genres || [], 8);
         if (livros.length > 0) {
           livrosEl.innerHTML = livros.slice(0, 4).map(b => renderLivroCard(b)).join('');
           livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
