@@ -207,13 +207,26 @@ export async function searchBooksByGenres(genres = [], limit = 8) {
   const subjects = [...new Set(genres.map(g => GENRE_TO_SUBJECT[g]).filter(Boolean))];
   if (subjects.length === 0) return [];
 
-  const subjectQuery = `subject:${subjects[0]}`;
-  const url = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(subjectQuery)}&maxResults=${limit}&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
+  // Combina até 2 subjects para resultados mais precisos
+  const subjectQuery = subjects.slice(0, 2).map(s => `subject:${s}`).join('+');
+  const url = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(subjectQuery)}&maxResults=${limit * 2}&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error('Erro ao buscar livros por gênero');
   const data = await res.json();
 
-  return (data.items || []).map(item => {
+  // Categorias a excluir
+  const EXCLUIR = ['poetry', 'poems', 'comic', 'graphic novel', 'juvenile nonfiction',
+    'nonfiction', 'biography', 'autobiography', 'self-help', 'essays', 'cooking',
+    'religion', 'science', 'history', 'true crime'];
+
+  const filtrados = (data.items || []).filter(item => {
+    const cats = (item.volumeInfo.categories || []).join(' ').toLowerCase();
+    const tipo = (item.volumeInfo.printType || '').toLowerCase();
+    if (tipo === 'magazine') return false;
+    return !EXCLUIR.some(exc => cats.includes(exc));
+  });
+
+  return filtrados.slice(0, limit).map(item => {
     const info = item.volumeInfo;
     return {
       id:     item.id,
