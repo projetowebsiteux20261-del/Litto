@@ -64,7 +64,7 @@
 
     #screen-explorar, #screen-bibliotecas-digitais,
     #screen-busca, #screen-livro, #screen-midia,
-    #screen-recomendacoes, #screen-perfil-publico {
+    #screen-perfil-publico {
       display: none;
     }
     #screen-explorar.active,
@@ -72,7 +72,6 @@
     #screen-busca.active,
     #screen-livro.active,
     #screen-midia.active,
-    #screen-recomendacoes.active,
     #screen-perfil-publico.active {
       display: block;
     }
@@ -99,7 +98,6 @@
       <a data-nav="home"           role="button" tabindex="0">Início</a>
       <a data-nav="mapa"           role="button" tabindex="0">Bibliotecas</a>
       <a data-nav="explorar"       role="button" tabindex="0">Explorar</a>
-      <a data-nav="recomendacoes"  role="button" tabindex="0">Recomendações</a>
       <a data-nav="perfil"         role="button" tabindex="0">Perfil</a>
     </nav>
     <div class="header-actions">
@@ -372,24 +370,11 @@
 
         <section class="mb-20">
           <div class="flex items-center gap-4 mb-10">
-            <div class="w-12 h-12 bg-yellow border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><span class="material-symbols-outlined text-black">trending_up</span></div>
-            <h2 class="text-3xl font-black">Tendências da Comunidade</h2>
+            <div class="w-12 h-12 bg-yellow border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"><span class="material-symbols-outlined text-black">recommend</span></div>
+            <h2 class="text-3xl font-black">Recomendações da Comunidade</h2>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6" style="min-height:400px;">
-            <div class="md:col-span-2 bg-blue border-2 border-black p-8 flex flex-col justify-end relative overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer">
-              <span class="material-symbols-outlined text-white text-9xl absolute top-8 right-8 opacity-20">forum</span>
-              <span class="bg-yellow text-black font-black px-4 py-1 text-sm border-2 border-black w-fit mb-4">DEBATE DO MÊS</span>
-              <h3 class="text-white text-4xl font-black mb-4">Capitu traiu Bentinho?</h3>
-              <p class="font-medium text-white/80 max-w-md">Junte-se a mais de 2.000 leitores nesta discussão clássica.</p>
-            </div>
-            <div class="bg-yellow border-2 border-black p-6 flex flex-col justify-between shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer">
-              <div class="flex justify-between items-start"><h3 class="text-2xl font-black text-black">Clube do Terror</h3><span class="material-symbols-outlined text-4xl text-black">skull</span></div>
-              <span class="font-bold text-sm text-black">+450 membros ativos</span>
-            </div>
-            <div class="flex flex-col gap-6">
-              <div class="bg-orange border-2 border-black p-6 flex flex-col justify-center items-center text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer flex-1"><span class="material-symbols-outlined text-5xl mb-2 text-white">star_half</span><h4 class="font-black text-lg text-white">Novos Críticos</h4></div>
-              <div class="bg-dark border-2 border-black p-6 flex flex-col justify-center items-center text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all cursor-pointer flex-1"><span class="material-symbols-outlined text-5xl mb-2 text-yellow">workspace_premium</span><h4 class="font-black text-lg text-white">Top Listas</h4></div>
-            </div>
+          <div id="explorar-recomendacoes" style="display:grid;gap:1rem;" aria-live="polite">
+            <p class="opacity-50 text-sm">Carregando recomendações…</p>
           </div>
         </section>
 
@@ -661,6 +646,75 @@
           </div>
         </section>
 
+        <!-- Recomendações da comunidade para esta mídia -->
+        <section class="max-w-6xl mx-auto mb-10">
+          <div class="flex items-center gap-4 mb-8">
+            <div class="w-10 h-10 bg-yellow border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-black">recommend</span>
+            </div>
+            <h2 class="text-2xl font-black">Recomendações da Comunidade</h2>
+          </div>
+          <div id="midia-recomendacoes-lista" style="display:grid;gap:1rem;margin-bottom:2rem;" aria-live="polite">
+            <p class="opacity-50 text-sm">Carregando recomendações…</p>
+          </div>
+
+          <!-- Formulário — só aparece pra logados (controlado via JS) -->
+          <div id="midia-rec-form-wrap" style="display:none;">
+            <div class="fundacao-form-card p-8">
+              <h3 id="midia-rec-form-titulo" class="text-xl font-black mb-6 uppercase">Recomendar um Livro</h3>
+              <form id="form-midia-recomendacao" novalidate>
+                <input type="hidden" id="rec-tmdb-id" />
+                <input type="hidden" id="rec-midia-titulo" />
+                <input type="hidden" id="rec-midia-tipo" />
+
+                <div class="form-group" style="margin-bottom:1.25rem;">
+                  <label for="rec-livro-nome" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
+                    Livro recomendado <span style="color:#fe4c00;">*</span>
+                  </label>
+                  <div style="position:relative;">
+                    <input type="text" id="rec-livro-nome" placeholder="Digite o nome do livro…" autocomplete="off"
+                      style="width:100%;border:2px solid #000;padding:0.75rem 1rem;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;background:#fff;" required />
+                    <div id="rec-livro-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid #000;border-top:none;z-index:100;max-height:200px;overflow-y:auto;"></div>
+                  </div>
+                  <input type="hidden" id="rec-livro-id" />
+                  <input type="hidden" id="rec-livro-autor-hidden" />
+                  <input type="hidden" id="rec-livro-cover-hidden" />
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.25rem;">
+                  <label for="rec-similaridade" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
+                    Quão parecidos são?
+                  </label>
+                  <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <button type="button" class="rec-sim-btn" data-value="1" style="font-size:1.2rem;background:none;border:2px solid #000;padding:4px 10px;cursor:pointer;" title="Pouco parecidos">🔗</button>
+                    <button type="button" class="rec-sim-btn" data-value="2" style="font-size:1.2rem;background:none;border:2px solid #000;padding:4px 10px;cursor:pointer;" title="Parecidos">🔗🔗</button>
+                    <button type="button" class="rec-sim-btn" data-value="3" style="font-size:1.2rem;background:none;border:2px solid #000;padding:4px 10px;cursor:pointer;" title="Muito parecidos">🔗🔗🔗</button>
+                  </div>
+                  <input type="hidden" id="rec-similaridade-val" value="0" />
+                </div>
+
+                <div class="form-group" style="margin-bottom:1.25rem;">
+                  <label for="rec-midia-texto" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
+                    Por que recomenda? <span style="opacity:0.5;font-weight:500;">(opcional)</span>
+                  </label>
+                  <textarea id="rec-midia-texto" rows="3" placeholder="Qual é a conexão entre eles?"
+                    style="width:100%;padding:0.85rem;border:2px solid #000;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;resize:vertical;background:#fff;"></textarea>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
+                  <input type="checkbox" id="rec-midia-spoiler" style="width:18px;height:18px;border:2px solid #000;cursor:pointer;accent-color:#fe4c00;" />
+                  <label for="rec-midia-spoiler" style="font-weight:700;font-size:0.85rem;cursor:pointer;">Contém spoilers — ocultar comentário por padrão</label>
+                </div>
+
+                <button type="submit" class="form-btn" style="max-width:240px;">Publicar Recomendação</button>
+              </form>
+            </div>
+          </div>
+          <div id="midia-rec-login-aviso" style="display:none;padding:1rem;border:2px solid #000;background:#fff;font-weight:700;font-size:0.9rem;">
+            <button data-nav="login" style="color:#5065ff;text-decoration:underline;background:none;border:none;cursor:pointer;font-weight:700;font-family:'Poppins',sans-serif;font-size:0.9rem;">Faça login</button> para recomendar um livro para esta obra.
+          </div>
+        </section>
+
       </div>
       <footer class="site-footer" role="contentinfo">
         <div>
@@ -751,18 +805,18 @@
           </button>
         </section>
 
-        <!-- Resenhas -->
+        <!-- Avaliações -->
         <section class="max-w-6xl mx-auto mb-10">
-          <h2 class="text-3xl font-black mb-8 uppercase">Resenhas da Comunidade</h2>
+          <h2 class="text-3xl font-black mb-8 uppercase">Avaliações da Comunidade</h2>
           <div id="livro-resenhas-lista" aria-live="polite">
-            <p class="opacity-50 text-sm">Seja o primeiro a resenhar este livro!</p>
+            <p class="opacity-50 text-sm">Seja o primeiro a avaliar este livro!</p>
           </div>
         </section>
 
-        <!-- Formulário de resenha -->
+        <!-- Formulário de avaliação -->
         <section class="max-w-6xl mx-auto mb-16">
           <div class="fundacao-form-card p-8">
-            <h2 id="resenha-form-titulo" class="text-2xl font-black mb-6 uppercase">Escrever Resenha</h2>
+            <h2 id="resenha-form-titulo" class="text-2xl font-black mb-6 uppercase">Escrever Avaliação</h2>
             <form id="form-resenha" novalidate>
               <!-- Campos ocultos com metadados do livro -->
               <input type="hidden" id="resenha-livro-id" />
@@ -782,7 +836,7 @@
               </div>
 
               <div class="form-group" style="margin-bottom:1.25rem;">
-                <label for="resenha-texto" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">Sua resenha</label>
+                <label for="resenha-texto" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">Sua avaliação</label>
                 <textarea id="resenha-texto" rows="5" placeholder="O que você achou do livro? Compartilhe sua experiência…" style="width:100%;padding:0.85rem;border:2px solid #000;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;resize:vertical;background:#fff;" required></textarea>
               </div>
 
@@ -791,7 +845,7 @@
                 <label for="resenha-spoiler" style="font-weight:700;font-size:0.85rem;cursor:pointer;">Contém spoilers — ocultar por padrão</label>
               </div>
 
-              <button type="submit" class="form-btn" style="max-width:280px;">Publicar Resenha</button>
+              <button type="submit" class="form-btn" style="max-width:280px;">Publicar Avaliação</button>
             </form>
           </div>
         </section>
@@ -845,7 +899,7 @@
             </div>
             <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem">
               <p id="stat-resenhas" style="font-size:2rem;font-weight:900;color:var(--tertiary);">0</p>
-              <p style="font-size:0.8rem;font-weight:700;">Resenhas</p>
+              <p style="font-size:0.8rem;font-weight:700;">Avaliações</p>
             </div>
           </div>
         </section>
@@ -880,14 +934,14 @@
           </div>
         </section>
 
-        <!-- Minhas resenhas -->
+        <!-- Minhas avaliações -->
         <section style="margin-bottom:3rem;" aria-labelledby="minhas-resenhas-h">
           <div class="section-header" style="margin-bottom:1.25rem;">
             <span class="material-symbols-outlined section-icon" style="color:var(--primary);" aria-hidden="true">rate_review</span>
-            <h2 id="minhas-resenhas-h" class="section-title">Minhas Resenhas</h2>
+            <h2 id="minhas-resenhas-h" class="section-title">Minhas Avaliações</h2>
           </div>
           <div id="perfil-resenhas">
-            <p class="opacity-50 text-sm">Você ainda não escreveu nenhuma resenha.</p>
+            <p class="opacity-50 text-sm">Você ainda não escreveu nenhuma avaliação.</p>
           </div>
         </section>
 
@@ -973,73 +1027,6 @@
     </section>
 
     <!-- ============================================================
-         TELA: RECOMENDAÇÕES DA COMUNIDADE
-    ============================================================ -->
-    <section id="screen-recomendacoes" class="screen" aria-label="Recomendações da comunidade" style="display:none;">
-      <div class="pt-8 pb-20 px-[5%] max-w-5xl mx-auto">
-
-        <header class="mb-10">
-          <div class="inline-block bg-yellow text-black px-4 py-1 border-2 border-black font-black text-sm mb-4 neo-brutal-shadow">COMUNIDADE</div>
-          <h1 class="text-4xl md:text-5xl font-black mb-3 text-dark uppercase">Recomendações</h1>
-          <p class="font-semibold text-gray-500 max-w-xl">Se você assistiu algo e lembrou de um livro incrível — compartilhe! Conecte filmes e séries com as obras que os inspiraram.</p>
-        </header>
-
-        <!-- Formulário de nova recomendação -->
-        <div class="fundacao-form-card p-8 mb-12">
-          <h2 id="rec-form-titulo" class="text-2xl font-black mb-6 uppercase">Nova Recomendação</h2>
-          <form id="form-recomendacao" novalidate>
-
-            <div class="form-group" style="margin-bottom:1.25rem;">
-              <label for="rec-midia" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
-                Filme ou série <span style="color:#fe4c00;">*</span>
-              </label>
-              <input type="text" id="rec-midia" placeholder="Ex: Duna (2021)" style="width:100%;border:2px solid #000;padding:0.75rem 1rem;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;background:#fff;" required />
-            </div>
-
-            <div class="form-group" style="margin-bottom:1.25rem;">
-              <label for="rec-livro" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
-                Livro recomendado <span style="color:#fe4c00;">*</span>
-              </label>
-              <input type="text" id="rec-livro" placeholder="Ex: Duna — Frank Herbert" style="width:100%;border:2px solid #000;padding:0.75rem 1rem;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;background:#fff;" required />
-            </div>
-
-            <div class="form-group" style="margin-bottom:1.25rem;">
-              <label for="rec-texto" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">Comentário <span style="opacity:0.5;font-weight:500;">(opcional)</span></label>
-              <textarea id="rec-texto" rows="4" placeholder="Por que você recomenda? Qual é a conexão entre eles?" style="width:100%;padding:0.85rem;border:2px solid #000;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;resize:vertical;background:#fff;"></textarea>
-            </div>
-
-            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
-              <input type="checkbox" id="rec-spoiler" style="width:18px;height:18px;border:2px solid #000;cursor:pointer;accent-color:#fe4c00;" />
-              <label for="rec-spoiler" style="font-weight:700;font-size:0.85rem;cursor:pointer;">Contém spoilers — ocultar comentário por padrão</label>
-            </div>
-
-            <button type="submit" class="form-btn" style="max-width:240px;">Publicar</button>
-          </form>
-        </div>
-
-        <!-- Lista de recomendações da comunidade -->
-        <section aria-labelledby="lista-recs-h">
-          <div class="flex items-center gap-4 mb-8">
-            <div class="w-10 h-10 bg-blue border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <span class="material-symbols-outlined text-white">recommend</span>
-            </div>
-            <h2 id="lista-recs-h" class="text-2xl font-black">Da Comunidade</h2>
-          </div>
-          <div id="lista-recomendacoes" style="display:grid;gap:1rem;" aria-live="polite">
-            <p class="opacity-50 text-sm">Carregando recomendações…</p>
-          </div>
-        </section>
-
-      </div>
-      <footer class="site-footer" role="contentinfo">
-        <div>
-          <span class="footer-logo">Litto Book Club.</span>
-          <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
-        </div>
-      </footer>
-    </section>
-
-    <!-- ============================================================
          TELA: PERFIL PÚBLICO DE OUTRO USUÁRIO
     ============================================================ -->
     <section id="screen-perfil-publico" class="screen" aria-label="Perfil público" style="display:none;">
@@ -1098,7 +1085,7 @@
   <nav id="bottom-nav" aria-label="Navegação por abas">
     <button class="bottom-nav-btn" data-nav="home"          aria-label="Início"><span class="material-symbols-outlined" aria-hidden="true">home</span>Início</button>
     <button class="bottom-nav-btn" data-nav="explorar"      aria-label="Explorar"><span class="material-symbols-outlined" aria-hidden="true">explore</span>Explorar</button>
-    <button class="bottom-nav-btn" data-nav="recomendacoes" aria-label="Recomendações"><span class="material-symbols-outlined" aria-hidden="true">recommend</span>Recomenda</button>
+    <button class="bottom-nav-btn" data-nav="busca"         aria-label="Buscar"><span class="material-symbols-outlined" aria-hidden="true">search</span>Buscar</button>
     <button class="bottom-nav-btn" data-nav="mapa"          aria-label="Mapa de bibliotecas"><span class="material-symbols-outlined" aria-hidden="true">map</span>Mapa</button>
     <button id="bottom-nav-login" class="bottom-nav-btn" data-nav="login" aria-label="Entrar"><span class="material-symbols-outlined" aria-hidden="true">login</span>Entrar</button>
   </nav>
