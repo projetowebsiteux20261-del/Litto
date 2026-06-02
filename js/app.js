@@ -454,7 +454,7 @@ document.addEventListener("click", (e) => {
   if (!navEl) return;
   e.preventDefault();
   const dest = navEl.dataset.nav;
-  if ((dest === "perfil" || dest === "recomendacoes") && !currentUser) { showScreen("login"); return; }
+  if (dest === "perfil" && !currentUser) { showScreen("login"); return; }
   showScreen(dest);
 });
 
@@ -484,7 +484,7 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     if (!user) {
       const telaAtiva = Object.entries(screens).find(([, el]) => el && el.classList.contains("active"))?.[0];
-      if (telaAtiva === "perfil" || telaAtiva === "recomendacoes") showScreen("login");
+      if (telaAtiva === "perfil") showScreen("login");
     }
   }
 });
@@ -680,7 +680,7 @@ if (formResenha) {
       carregarResenhasLivro(livroId);
       if (screens.perfil?.classList.contains('active')) carregarPerfilProprio();
     } catch(err) { console.error(err); alert('Erro ao salvar resenha.'); }
-    finally { btn.disabled = false; }
+    finally { btn.disabled = false; btn.textContent = resenhaEditandoId ? 'Salvar Alterações' : 'Publicar Resenha'; }
   });
 }
 
@@ -813,7 +813,7 @@ async function carregarRecomendacoes() {
     if (snap.empty) { el.innerHTML = '<p class="opacity-50 text-sm">Nenhuma recomendação ainda. Seja o primeiro!</p>'; return; }
     el.innerHTML = snap.docs.map(d => renderRecCard({ id: d.id, ...d.data() })).join('');
     ativarSpoilerBtns(el);
-  } catch(err) { el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar recomendações.</p>'; }
+  } catch(err) { console.error('Erro ao carregar recomendações:', err); el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar recomendações.</p>'; }
 }
 
 function renderRecCard(r) {
@@ -887,7 +887,8 @@ document.addEventListener('click', async (e) => {
 
 // ─── Perfil público de outros usuários ──────────────────────
 async function abrirPerfilPublico(uid) {
-  if (uid === currentUser?.uid) { showScreen('perfil'); return; }
+  if (!uid) return;
+  if (currentUser && uid === currentUser.uid) { showScreen('perfil'); return; }
   previousScreen = Object.entries(screens).find(([, el]) => el?.classList.contains('active'))?.[0] || 'home';
   showScreen('perfil-publico');
   const elNome   = document.getElementById('pub-perfil-nome');
@@ -917,7 +918,11 @@ async function abrirPerfilPublico(uid) {
       if (resSnap.empty) { elRes.innerHTML = '<p class="opacity-50 text-sm">Nenhuma resenha ainda.</p>'; }
       else { elRes.innerHTML = resSnap.docs.map(d => renderResenhaCard({ id: d.id, ...d.data() })).join(''); ativarSpoilerBtns(elRes); }
     }
-  } catch(err) { console.error('Erro ao carregar perfil público:', err); }
+  } catch(err) {
+    console.error('Erro ao carregar perfil público:', err);
+    if (elRecs) elRecs.innerHTML = '<p class="opacity-50 text-sm">Não foi possível carregar as recomendações.</p>';
+    if (elRes)  elRes.innerHTML  = '<p class="opacity-50 text-sm">Não foi possível carregar as resenhas.</p>';
+  }
 }
 
 document.getElementById('pub-perfil-back-btn')?.addEventListener('click', () => showScreen(previousScreen || 'home'));
