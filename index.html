@@ -789,6 +789,11 @@
         <form id="form-login" novalidate>
           <div class="form-group"><label for="login-email">E-mail</label><input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" required aria-describedby="err-login-email" /><p class="field-error" id="err-login-email" role="alert"></p></div>
           <div class="form-group"><label for="login-senha">Senha</label><input type="password" id="login-senha" placeholder="Sua senha" autocomplete="current-password" required aria-describedby="err-login-senha" /><p class="field-error" id="err-login-senha" role="alert"></p></div>
+          <div style="text-align:right;margin-bottom:1rem;">
+            <button data-nav="recuperar-senha" style="background:none;border:none;cursor:pointer;font-size:0.85rem;font-weight:700;text-decoration:underline;font-family:'Poppins',sans-serif;padding:0;">
+              Esqueci minha senha
+            </button>
+          </div>
           <button type="submit" class="form-btn">Entrar</button>
         </form>
         <p class="form-link">Ainda não tem conta? <button data-nav="cadastro">Cadastre-se</button></p>
@@ -811,6 +816,26 @@
           <button type="submit" class="form-btn">Cadastrar</button>
         </form>
         <p class="form-link">Já tem uma conta? <button data-nav="login">Entrar</button></p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TELA: RECUPERAR SENHA
+    ============================================================ -->
+    <section id="screen-recuperar-senha" class="screen" aria-label="Recuperar senha">
+      <div class="form-card">
+        <h1 class="form-title">Recuperar senha</h1>
+        <p class="form-subtitle">Informe seu e-mail e enviaremos um link para criar uma nova senha.</p>
+        <div id="recuperar-alert" class="alert-message" role="alert" aria-live="polite"></div>
+        <form id="form-recuperar-senha" novalidate>
+          <div class="form-group">
+            <label for="rec-email">E-mail</label>
+            <input type="email" id="rec-email" placeholder="seu@email.com" autocomplete="email" required aria-describedby="err-rec-email" />
+            <p class="field-error" id="err-rec-email" role="alert"></p>
+          </div>
+          <button type="submit" class="form-btn">Enviar link de recuperação</button>
+        </form>
+        <p class="form-link">Lembrou a senha? <button data-nav="login">Voltar ao login</button></p>
       </div>
     </section>
 
