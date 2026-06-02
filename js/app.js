@@ -876,7 +876,7 @@ function renderRecCard(r) {
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-        <span style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;">${r.midiaTitulo || r.midia || '–'}</span>
+        <span style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;">${r.midiaTitulo || r.midia || '(obra não identificada)'}</span>
         <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
         <span style="font-weight:700;font-size:0.95rem;background:#ffdf2b;color:#000;padding:3px 10px;border:2px solid #000;">${r.livroNome || r.livro || '–'}</span>
         ${renderSimIndicator(r.similaridade)}
