@@ -298,11 +298,28 @@ export async function searchBooksByGenres(genres = [], limit = 8, mediaTitle = '
   if (mediaTitle) {
     const cleanTitle = mediaTitle.split(':')[0].split('–')[0].trim();
     try {
-      const url1 = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(`"${cleanTitle}"`)}&maxResults=4&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
-      const r1 = await fetch(url1);
-      if (r1.ok) {
-        const d1 = await r1.json();
-        addResults((d1.items || []).map(normalize), 10);
+      // Busca sem aspas (mais abrangente)
+      const url1a = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(cleanTitle)}&maxResults=6&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
+      const r1a = await fetch(url1a);
+      if (r1a.ok) {
+        const d1a = await r1a.json();
+        const mapped = (d1a.items || []).map(normalize);
+        // Dá score extra para títulos que batem exatamente
+        for (const item of mapped) {
+          if (!seen.has(item.id) && isValid(item)) {
+            seen.add(item.id);
+            const titleMatch = item.title.toLowerCase().includes(cleanTitle.toLowerCase()) ||
+                               cleanTitle.toLowerCase().includes(item.title.toLowerCase().split(':')[0]);
+            results.push({ ...item, _score: titleMatch ? 12 : 7 });
+          }
+        }
+      }
+      // Busca com intitle para refinar ainda mais
+      const url1b = `${GOOGLE_BOOKS_BASE}/volumes?q=intitle:${encodeURIComponent(cleanTitle)}&maxResults=4&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
+      const r1b = await fetch(url1b);
+      if (r1b.ok) {
+        const d1b = await r1b.json();
+        addResults((d1b.items || []).map(normalize), 15);
       }
     } catch(_) {}
   }
