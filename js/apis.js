@@ -7,9 +7,8 @@
 import { GOOGLE_BOOKS_KEY, TMDB_API_KEY } from './config.js';
 
 const GOOGLE_BOOKS_BASE = 'https://www.googleapis.com/books/v1';
-
-const TMDB_BASE    = 'https://api.themoviedb.org/3';
-const TMDB_IMG     = 'https://image.tmdb.org/t/p/w300';
+const TMDB_BASE         = 'https://api.themoviedb.org/3';
+const TMDB_IMG          = 'https://image.tmdb.org/t/p/w300';
 
 // ──────────────────────────────────────────
 //  LIVROS – Google Books
@@ -117,11 +116,61 @@ export async function getMediaDetails(id, type) {
       };
 }
 
-export async function findAdaptations(bookTitle) {
-  const results = await searchMedia(bookTitle, 3);
-  const words = bookTitle.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-  return [...results.movies, ...results.series]
-    .map(item => ({ ...item, _score: words.filter(w => item.title.toLowerCase().includes(w)).length }))
+// ──────────────────────────────────────────
+//  findAdaptations – busca livro → filmes
+//  Estratégia em camadas:
+//  1. Busca exata pelo título
+//  2. Se poucos resultados, busca por palavras-chave do título
+//  3. Pontua por título + overview
+// ──────────────────────────────────────────
+export async function findAdaptations(bookTitle, bookAutor = '') {
+  // Normaliza o título removendo subtítulos (ex: "Duna: Parte 1" → "Duna")
+  const cleanTitle = bookTitle.split(':')[0].split('–')[0].trim();
+
+  // Busca 1: título limpo exato
+  const exact = await searchMedia(cleanTitle, 6);
+  const allResults = [...exact.movies, ...exact.series];
+
+  // Busca 2: se poucos resultados, busca pelo nome do autor também
+  let extra = [];
+  if (allResults.length < 3 && bookAutor) {
+    const byAuthor = await searchMedia(`${cleanTitle} ${bookAutor.split(' ').slice(-1)[0]}`, 4);
+    extra = [...byAuthor.movies, ...byAuthor.series];
+  }
+
+  const combined = [...allResults, ...extra];
+  const seen = new Set();
+  const deduped = combined.filter(item => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+
+  // Pontua cada resultado
+  const titleWords = cleanTitle.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+
+  const scored = deduped.map(item => {
+    const itemTitle = item.title.toLowerCase();
+    let score = 0;
+
+    // Correspondência exata do título (melhor sinal)
+    if (itemTitle === cleanTitle.toLowerCase()) score += 10;
+
+    // Título contém o título do livro inteiro
+    if (itemTitle.includes(cleanTitle.toLowerCase())) score += 6;
+
+    // Palavras do título em comum
+    score += titleWords.filter(w => itemTitle.includes(w)).length * 2;
+
+    // Penaliza se o título do item não tem nenhuma palavra em comum
+    const itemWords = itemTitle.split(/\s+/);
+    const overlap = titleWords.filter(w => itemWords.some(iw => iw.includes(w) || w.includes(iw)));
+    if (overlap.length === 0) score -= 5;
+
+    return { ...item, _score: score };
+  });
+
+  return scored
     .filter(item => item._score > 0)
     .sort((a, b) => b._score - a._score)
     .slice(0, 6);
@@ -182,7 +231,7 @@ export async function searchMediaWithFilters({ query = '', genreId = null, year 
 }
 
 // ──────────────────────────────────────────
-//  Recomendações por gênero via Google Books
+//  Mapa de gêneros Google Books
 // ──────────────────────────────────────────
 const GENRE_TO_SUBJECT = {
   'Ficção científica': 'science fiction',
@@ -203,30 +252,19 @@ const GENRE_TO_SUBJECT = {
   'Comédia':           'humorous fiction',
 };
 
-export async function searchBooksByGenres(genres = [], limit = 8) {
-  const subjects = [...new Set(genres.map(g => GENRE_TO_SUBJECT[g]).filter(Boolean))];
-  if (subjects.length === 0) return [];
-
-  // Combina até 2 subjects para resultados mais precisos
-  const subjectQuery = subjects.slice(0, 2).map(s => `subject:${s}`).join('+');
-  const url = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(subjectQuery)}&maxResults=${limit * 2}&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Erro ao buscar livros por gênero');
-  const data = await res.json();
-
-  // Categorias a excluir
+// ──────────────────────────────────────────
+//  Recomendações de livros baseadas em mídia
+//  Estratégia em camadas:
+//  1. Busca pelo título exato da mídia
+//  2. Busca por gênero + palavras-chave da sinopse
+//  3. Combina e deduplica, priorizando matches de título
+// ──────────────────────────────────────────
+export async function searchBooksByGenres(genres = [], limit = 8, mediaTitle = '', mediaOverview = '') {
   const EXCLUIR = ['poetry', 'poems', 'comic', 'graphic novel', 'juvenile nonfiction',
     'nonfiction', 'biography', 'autobiography', 'self-help', 'essays', 'cooking',
     'religion', 'science', 'history', 'true crime'];
 
-  const filtrados = (data.items || []).filter(item => {
-    const cats = (item.volumeInfo.categories || []).join(' ').toLowerCase();
-    const tipo = (item.volumeInfo.printType || '').toLowerCase();
-    if (tipo === 'magazine') return false;
-    return !EXCLUIR.some(exc => cats.includes(exc));
-  });
-
-  return filtrados.slice(0, limit).map(item => {
+  const normalize = item => {
     const info = item.volumeInfo;
     return {
       id:     item.id,
@@ -235,6 +273,82 @@ export async function searchBooksByGenres(genres = [], limit = 8) {
       year:   info.publishedDate?.slice(0, 4) ?? null,
       cover:  info.imageLinks?.thumbnail?.replace('http:', 'https:') ?? null,
       olUrl:  info.infoLink,
+      _cats:  (info.categories || []).join(' ').toLowerCase(),
     };
-  });
+  };
+
+  const isValid = item => {
+    if (!item.title) return false;
+    return !EXCLUIR.some(exc => item._cats.includes(exc));
+  };
+
+  const results = [];
+  const seen = new Set();
+
+  const addResults = (items, scoreBonus = 0) => {
+    for (const item of items) {
+      if (!seen.has(item.id) && isValid(item)) {
+        seen.add(item.id);
+        results.push({ ...item, _score: scoreBonus });
+      }
+    }
+  };
+
+  // ── Camada 1: título exato da mídia (maior prioridade)
+  if (mediaTitle) {
+    const cleanTitle = mediaTitle.split(':')[0].split('–')[0].trim();
+    try {
+      const url1 = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(`"${cleanTitle}"`)}&maxResults=4&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
+      const r1 = await fetch(url1);
+      if (r1.ok) {
+        const d1 = await r1.json();
+        addResults((d1.items || []).map(normalize), 10);
+      }
+    } catch(_) {}
+  }
+
+  // ── Camada 2: palavras-chave da sinopse + gênero
+  if (mediaOverview && genres.length > 0) {
+    try {
+      // Extrai substantivos relevantes da sinopse (palavras longas, sem stopwords)
+      const stopwords = new Set(['que','para','com','uma','por','dos','das','seu','sua','seus','suas',
+        'este','esta','estes','estas','esse','essa','num','numa','the','and','for','with','from','this','that','their','they','have','been','when','where','which','about','into','after','before']);
+      const keywords = mediaOverview
+        .toLowerCase()
+        .replace(/[^a-záéíóúâêîôûãõàèìòùç\s]/g, '')
+        .split(/\s+/)
+        .filter(w => w.length > 5 && !stopwords.has(w))
+        .slice(0, 4);
+
+      const subject = GENRE_TO_SUBJECT[genres[0]] || 'fiction';
+      if (keywords.length > 0) {
+        const kw = keywords.slice(0, 2).join('+');
+        const url2 = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(kw)}+subject:${encodeURIComponent(subject)}&maxResults=6&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
+        const r2 = await fetch(url2);
+        if (r2.ok) {
+          const d2 = await r2.json();
+          addResults((d2.items || []).map(normalize), 5);
+        }
+      }
+    } catch(_) {}
+  }
+
+  // ── Camada 3: só por gênero (fallback)
+  const subjects = [...new Set(genres.map(g => GENRE_TO_SUBJECT[g]).filter(Boolean))];
+  if (subjects.length > 0 && results.length < limit) {
+    try {
+      const subjectQuery = subjects.slice(0, 2).map(s => `subject:${s}`).join('+');
+      const url3 = `${GOOGLE_BOOKS_BASE}/volumes?q=${encodeURIComponent(subjectQuery)}&maxResults=${limit * 2}&orderBy=relevance&key=${GOOGLE_BOOKS_KEY}`;
+      const r3 = await fetch(url3);
+      if (r3.ok) {
+        const d3 = await r3.json();
+        addResults((d3.items || []).map(normalize), 1);
+      }
+    } catch(_) {}
+  }
+
+  return results
+    .sort((a, b) => b._score - a._score)
+    .slice(0, limit)
+    .map(({ _score, _cats, ...item }) => item); // limpa campos internos
 }
