@@ -752,7 +752,9 @@ function renderResenhaCard(r) {
       </div>`
     : `<p>${r.texto}</p>`;
   const livroInfo = r.livroTitulo
-    ? `<div style="margin-bottom:0.6rem;padding:0.4rem 0.75rem;background:#f5f5f5;border-left:3px solid #5065ff;font-size:0.8rem;font-weight:700;">${r.livroTitulo}${r.livroAutor ? ` — <span style="font-weight:500;opacity:0.7;">${r.livroAutor}</span>` : ''}</div>`
+    ? `<div style="margin-bottom:0.6rem;padding:0.4rem 0.75rem;background:#f5f5f5;border-left:3px solid #5065ff;font-size:0.8rem;font-weight:700;${r.livroId ? 'cursor:pointer;' : ''}">
+        <span ${r.livroId ? `data-abrir-livro-id="${r.livroId}" data-abrir-livro-titulo="${(r.livroTitulo||'').replace(/"/g,'&quot;')}" data-abrir-livro-autor="${(r.livroAutor||'').replace(/"/g,'&quot;')}" data-abrir-livro-cover="${r.livroCover||''}" style="text-decoration:underline dotted;cursor:pointer;"` : ''}>${r.livroTitulo}</span>${r.livroAutor ? ` — <span style="font-weight:500;opacity:0.7;">${r.livroAutor}</span>` : ''}
+       </div>`
     : '';
   return `
     <div class="resenha-card" data-resenha-id="${r.id}" data-livro-id="${r.livroId||''}" data-livro-titulo="${(r.livroTitulo||'').replace(/"/g,'&quot;')}" data-livro-autor="${(r.livroAutor||'').replace(/"/g,'&quot;')}" data-livro-cover="${r.livroCover||''}" data-nota="${r.nota||0}" style="border:2px solid #000;padding:1.25rem;margin-bottom:1rem;background:#fff;box-shadow:4px 4px 0 0 #000;">
