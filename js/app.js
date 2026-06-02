@@ -640,8 +640,18 @@ document.addEventListener('click', async (e) => {
   if (btnLivro) { const tipo = btnLivro.dataset.tipo; await removerDaEstante(tipo, btnLivro.dataset.removerLivro); return; }
   if (btnFilme) { await removerDaEstante('filmesVistos', btnFilme.dataset.removerFilme); return; }
 
-  // Clique no card do livro da estante → abrir página do livro
-  const cardLivro = e.target.closest('[data-abrir-livro-id]');
+  // Clique no título do livro num card de recomendação → abrir página do livro
+  const spanLivro = e.target.closest('[data-abrir-livro-id]');
+  if (spanLivro && spanLivro.dataset.abrirLivroId) {
+    abrirLivro(spanLivro.dataset.abrirLivroId, spanLivro.dataset.abrirLivroTitulo, spanLivro.dataset.abrirLivroAutor, spanLivro.dataset.abrirLivroCover);
+    return;
+  }
+  // Clique no título do filme num card de recomendação → abrir página da mídia
+  const spanMidia = e.target.closest('[data-abrir-midia-id]');
+  if (spanMidia && spanMidia.dataset.abrirMidiaId && !spanMidia.closest('.bk-card')) {
+    abrirMidia(spanMidia.dataset.abrirMidiaId, spanMidia.dataset.abrirMidiaTipo, spanMidia.dataset.abrirMidiaTitulo, spanMidia.dataset.abrirMidiaPoster);
+    return;
+  }
   if (cardLivro && !e.target.closest('button')) {
     abrirLivro(cardLivro.dataset.abrirLivroId, cardLivro.dataset.abrirLivroTitulo, cardLivro.dataset.abrirLivroAutor, cardLivro.dataset.abrirLivroCover);
     return;
@@ -881,7 +891,7 @@ function renderRecCard(r) {
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <span data-abrir-midia-id="${r.tmdbId||''}" data-abrir-midia-tipo="${r.midiaTipo||'movie'}" data-abrir-midia-titulo="${(r.midiaTitulo||r.midia||'').replace(/"/g,'&quot;')}" style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;${r.tmdbId ? 'cursor:pointer;text-decoration:underline dotted;' : ''}">${r.midiaTitulo || r.midia || '(obra não identificada)'}</span>
         <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
-        <span style="font-weight:700;font-size:0.95rem;background:#ffdf2b;color:#000;padding:3px 10px;border:2px solid #000;">${r.livroNome || r.livro || '–'}</span>
+        <span data-abrir-livro-id="${r.livroId||''}" data-abrir-livro-titulo="${(r.livroNome||r.livro||'').replace(/"/g,'&quot;')}" data-abrir-livro-autor="${(r.livroAutor||'').replace(/"/g,'&quot;')}" data-abrir-livro-cover="${r.livroCover||''}" style="font-weight:700;font-size:0.95rem;background:#ffdf2b;color:#000;padding:3px 10px;border:2px solid #000;${r.livroId ? 'cursor:pointer;text-decoration:underline dotted;' : ''}">${r.livroNome || r.livro || '–'}</span>
         ${renderSimIndicator(r.similaridade)}
       </div>
       ${textoHtml}
