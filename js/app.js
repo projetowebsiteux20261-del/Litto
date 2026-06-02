@@ -259,15 +259,22 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
       if (detalhes.seasons) document.getElementById('midia-extra').textContent = `${detalhes.seasons} temporada(s)`;
       const tagsEl = document.getElementById('midia-tags');
       const cores = ['bg-orange text-white', 'bg-blue text-white', 'bg-yellow text-black'];
-      (detalhes.genres || []).slice(0, 4).forEach((g, i) => {
-        const span = document.createElement('span');
-        span.className = `${cores[i % cores.length]} px-3 py-1 font-black text-xs uppercase border-2 border-black`;
-        span.textContent = g;
-        tagsEl.appendChild(span);
-      });
+(detalhes.subjects || []).slice(0, 4).forEach((s, i) => {
+  const span = document.createElement('span');
+  span.className = `${cores[i % cores.length]} px-3 py-1 font-black text-xs uppercase border-2 border-black cursor-pointer hover:-translate-y-0.5 transition-all`;
+  span.textContent = s;
+  span.title = `Buscar por ${s}`;
+  span.addEventListener('click', () => navegarParaTagGenero(s));
+  tagsEl.appendChild(span);
+});
       const livrosEl = document.getElementById('midia-livros');
       try {
-        const livros = await searchBooksByGenres(detalhes.genres || [], 8);
+        const livros = await searchBooksByGenres(
+  detalhes.genres || [],
+  8,
+  titulo,                        // passa o título da mídia
+  detalhes.overview || ''        // passa a sinopse
+);
         if (livros.length > 0) {
           livrosEl.innerHTML = livros.slice(0, 4).map(b => renderLivroCard(b)).join('');
           livrosEl.querySelectorAll('[data-livro-id]').forEach(el => {
@@ -329,12 +336,14 @@ async function abrirLivro(workId, titulo, autor, cover, ano) {
       document.getElementById('livro-ol-link').href = detalhes.olUrl || '#';
       const tagsEl = document.getElementById('livro-tags');
       const cores = ['bg-yellow text-black', 'bg-blue text-white', 'bg-orange text-white'];
-      (detalhes.subjects || []).slice(0, 4).forEach((s, i) => {
-        const span = document.createElement('span');
-        span.className = `${cores[i % cores.length]} px-3 py-1 font-black text-xs uppercase border-2 border-black`;
-        span.textContent = s;
-        tagsEl.appendChild(span);
-      });
+(detalhes.genres || []).slice(0, 4).forEach((g, i) => {
+  const span = document.createElement('span');
+  span.className = `${cores[i % cores.length]} px-3 py-1 font-black text-xs uppercase border-2 border-black cursor-pointer hover:-translate-y-0.5 transition-all`;
+  span.textContent = g;
+  span.title = `Buscar por ${g}`;
+  span.addEventListener('click', () => navegarParaTagGenero(g));
+  tagsEl.appendChild(span);
+});
     } else {
       document.getElementById('livro-descricao').textContent = 'Descrição não disponível.';
     }
