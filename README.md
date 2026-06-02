@@ -7,8 +7,7 @@
 
 [Relatório com Prompts e a Construção do Site](https://docs.google.com/document/d/1ideQjPIe4iG8YgkinwrDrprxIPqq8TlQd6oawwPcxhI/)
 
-[Apresentação Canva]
-([https://www.canva.com/design/DAHGadADBJU/qTKUUO15QA0woyfk9rbQXg/edit?utm_content=DAHGadADBJU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutto)](https://canva.link/fbigvrqul4mdwnp)
+[Apresentação Canva](https://canva.link/fbigvrqul4mdwnp)
 
 ## Prompt original (reconstruído para referência)
 
