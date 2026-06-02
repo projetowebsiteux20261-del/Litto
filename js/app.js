@@ -40,7 +40,7 @@ const screens = {
   busca:                  document.getElementById("screen-busca"),
   livro:                  document.getElementById("screen-livro"),
   midia:                  document.getElementById("screen-midia"),
-  recomendacoes:          document.getElementById("screen-recomendacoes"),
+  recomendacoes:          null, // movido para dentro do explorar
 };
 
 // ─── Histórico de navegação ──────────────────────────────────
@@ -305,6 +305,24 @@ async function abrirMidia(id, tipo, titulo, poster, ano, rating, overview) {
   document.getElementById('midia-descricao').textContent = overview || 'Carregando sinopse…';
   document.getElementById('midia-tags').innerHTML        = '';
   document.getElementById('midia-livros').innerHTML      = '<p class="opacity-50 col-span-full text-sm">Buscando livros relacionados…</p>';
+
+  // Preenche campos ocultos do formulário de recomendação
+  const inputTmdbId = document.getElementById('rec-tmdb-id');
+  const inputMidiaTitulo = document.getElementById('rec-midia-titulo');
+  const inputMidiaTipo = document.getElementById('rec-midia-tipo');
+  if (inputTmdbId) inputTmdbId.value = id;
+  if (inputMidiaTitulo) inputMidiaTitulo.value = titulo || '';
+  if (inputMidiaTipo) inputMidiaTipo.value = tipo || '';
+
+  // Mostra formulário ou aviso de login
+  const formWrap = document.getElementById('midia-rec-form-wrap');
+  const loginAviso = document.getElementById('midia-rec-login-aviso');
+  if (formWrap) formWrap.style.display = currentUser ? 'block' : 'none';
+  if (loginAviso) loginAviso.style.display = currentUser ? 'none' : 'block';
+
+  // Carrega recomendações da comunidade para este filme/série
+  carregarRecomendacoesMidia(id);
+
   const posterWrap = document.getElementById('midia-poster-wrap');
   posterWrap.innerHTML = poster
     ? `<img src="${poster}" alt="${titulo}" style="width:100%;border:4px solid #000;box-shadow:12px 12px 0 0 #5065ff;" loading="lazy">`
@@ -443,8 +461,7 @@ function showScreen(name) {
   navLinks.forEach(l => { if (l.dataset.nav === name) l.classList.add("active"); });
   if (name === "mapa")          setTimeout(initMap, 100);
   if (name === "home")          { setTimeout(initMapHome, 200); carregarEstatisticasComunidade(); }
-  if (name === "explorar")      carregarCapasExplorar();
-  if (name === "recomendacoes") carregarRecomendacoes();
+  if (name === "explorar")      { carregarCapasExplorar(); carregarRecomendacoesExplorar(); }
   if (name === "perfil" && currentUser) carregarPerfilProprio();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -551,7 +568,7 @@ function renderEstante(items, tipo) {
   if (!el) return;
   if (items.length === 0) { el.innerHTML = `<p class="opacity-50 text-sm col-span-full">Nenhum livro aqui ainda.</p>`; return; }
   el.innerHTML = items.map(item => `
-    <div class="bk-card" style="position:relative;">
+    <div class="bk-card" style="position:relative;cursor:pointer;" data-abrir-livro-id="${item.id}" data-abrir-livro-titulo="${(item.titulo||'').replace(/"/g,'&quot;')}" data-abrir-livro-autor="${(item.autor||'').replace(/"/g,'&quot;')}" data-abrir-livro-cover="${item.cover||''}">
       <div class="book-spine" style="background:var(--tertiary);overflow:hidden;">
         ${item.cover ? `<img src="${item.cover}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<span class="material-symbols-outlined" style="font-size:2.5rem;color:#fff;">menu_book</span>`}
       </div>
@@ -569,7 +586,7 @@ function renderFilmesVistos(items) {
   if (!el) return;
   if (items.length === 0) { el.innerHTML = `<p class="opacity-50 text-sm col-span-full">Nenhum filme/série aqui ainda.</p>`; return; }
   el.innerHTML = items.map(item => `
-    <div class="bk-card" style="position:relative;">
+    <div class="bk-card" style="position:relative;cursor:pointer;" data-abrir-midia-id="${item.id}" data-abrir-midia-tipo="${item.tipo||'movie'}" data-abrir-midia-titulo="${(item.titulo||'').replace(/"/g,'&quot;')}" data-abrir-midia-poster="${item.poster||''}">
       <div class="book-spine" style="background:var(--primary);overflow:hidden;">
         ${item.poster ? `<img src="${item.poster}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">` : `<span class="material-symbols-outlined" style="font-size:2.5rem;color:#fff;">movie</span>`}
       </div>
@@ -617,8 +634,21 @@ async function removerDaEstante(tipo, itemId) {
 document.addEventListener('click', async (e) => {
   const btnLivro  = e.target.closest('[data-remover-livro]');
   const btnFilme  = e.target.closest('[data-remover-filme]');
-  if (btnLivro) { const tipo = btnLivro.dataset.tipo; await removerDaEstante(tipo, btnLivro.dataset.removerLivro); }
-  if (btnFilme) { await removerDaEstante('filmesVistos', btnFilme.dataset.removerFilme); }
+  if (btnLivro) { const tipo = btnLivro.dataset.tipo; await removerDaEstante(tipo, btnLivro.dataset.removerLivro); return; }
+  if (btnFilme) { await removerDaEstante('filmesVistos', btnFilme.dataset.removerFilme); return; }
+
+  // Clique no card do livro da estante → abrir página do livro
+  const cardLivro = e.target.closest('[data-abrir-livro-id]');
+  if (cardLivro && !e.target.closest('button')) {
+    abrirLivro(cardLivro.dataset.abrirLivroId, cardLivro.dataset.abrirLivroTitulo, cardLivro.dataset.abrirLivroAutor, cardLivro.dataset.abrirLivroCover);
+    return;
+  }
+  // Clique no card do filme da estante → abrir página da mídia
+  const cardMidia = e.target.closest('[data-abrir-midia-id]');
+  if (cardMidia && !e.target.closest('button')) {
+    abrirMidia(cardMidia.dataset.abrirMidiaId, cardMidia.dataset.abrirMidiaTipo, cardMidia.dataset.abrirMidiaTitulo, cardMidia.dataset.abrirMidiaPoster);
+    return;
+  }
 });
 
 // Botões "Adicionar à estante" nas páginas de livro e mídia
@@ -675,12 +705,12 @@ if (formResenha) {
         await addDoc(collection(db, "reviews"), payload);
       }
       formResenha.reset();
-      document.getElementById('resenha-form-titulo').textContent = 'Escrever Resenha';
-      btn.textContent = 'Publicar Resenha';
+      document.getElementById('resenha-form-titulo').textContent = 'Escrever Avaliação';
+      btn.textContent = 'Publicar Avaliação';
       carregarResenhasLivro(livroId);
       if (screens.perfil?.classList.contains('active')) carregarPerfilProprio();
     } catch(err) { console.error(err); alert('Erro ao salvar resenha.'); }
-    finally { btn.disabled = false; btn.textContent = resenhaEditandoId ? 'Salvar Alterações' : 'Publicar Resenha'; }
+    finally { btn.disabled = false; btn.textContent = resenhaEditandoId ? 'Salvar Alterações' : 'Publicar Avaliação'; }
   });
 }
 
@@ -708,8 +738,12 @@ function renderResenhaCard(r) {
         </button>
       </div>`
     : `<p>${r.texto}</p>`;
+  const livroInfo = r.livroTitulo
+    ? `<div style="margin-bottom:0.6rem;padding:0.4rem 0.75rem;background:#f5f5f5;border-left:3px solid #5065ff;font-size:0.8rem;font-weight:700;">${r.livroTitulo}${r.livroAutor ? ` — <span style="font-weight:500;opacity:0.7;">${r.livroAutor}</span>` : ''}</div>`
+    : '';
   return `
-    <div class="resenha-card" data-resenha-id="${r.id}" style="border:2px solid #000;padding:1.25rem;margin-bottom:1rem;background:#fff;box-shadow:4px 4px 0 0 #000;">
+    <div class="resenha-card" data-resenha-id="${r.id}" data-livro-id="${r.livroId||''}" data-livro-titulo="${(r.livroTitulo||'').replace(/"/g,'&quot;')}" data-livro-autor="${(r.livroAutor||'').replace(/"/g,'&quot;')}" data-livro-cover="${r.livroCover||''}" data-nota="${r.nota||0}" style="border:2px solid #000;padding:1.25rem;margin-bottom:1rem;background:#fff;box-shadow:4px 4px 0 0 #000;">
+      ${livroInfo}
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
         <div>
           <span style="font-weight:900;font-size:0.9rem;">${r.nomeUsuario}</span>
@@ -730,7 +764,7 @@ function renderResenhaCard(r) {
 function renderMinhasResenhas(resenhas) {
   const el = document.getElementById('perfil-resenhas');
   if (!el) return;
-  if (resenhas.length === 0) { el.innerHTML = '<p class="opacity-50 text-sm">Você ainda não escreveu nenhuma resenha.</p>'; return; }
+  if (resenhas.length === 0) { el.innerHTML = '<p class="opacity-50 text-sm">Você ainda não escreveu nenhuma avaliação.</p>'; return; }
   el.innerHTML = resenhas.map(r => renderResenhaCard(r)).join('');
   ativarSpoilerBtns(el);
 }
@@ -744,24 +778,42 @@ function ativarSpoilerBtns(container) {
   });
 }
 
-// Delegação para editar/apagar resenha
+// Delegação para editar/apagar avaliação
 document.addEventListener('click', async (e) => {
   const editBtn   = e.target.closest('[data-editar-resenha]');
   const apagarBtn = e.target.closest('[data-apagar-resenha]');
   if (editBtn) {
-    const id = editBtn.dataset.editarResenha;
+    const id   = editBtn.dataset.editarResenha;
     const card = editBtn.closest('[data-resenha-id]');
     const texto = card?.querySelector('p')?.textContent || card?.querySelector('.spoiler-blur')?.textContent || '';
-    const nota  = card?.querySelector('.resenha-card')?.dataset.nota || 0;
-    document.getElementById('resenha-texto').value = texto;
-    document.getElementById('resenha-form-titulo').textContent = 'Editar Resenha';
-    const btn = formResenha?.querySelector('button[type=submit]');
-    if (btn) btn.textContent = 'Salvar Alterações';
-    resenhaEditandoId = id;
-    document.getElementById('resenha-texto')?.scrollIntoView({ behavior: 'smooth' });
+    const nota  = card?.dataset.nota || '5';
+    if (screens.livro?.classList.contains('active')) {
+      document.getElementById('resenha-texto').value = texto;
+      const notaEl = document.getElementById('resenha-nota');
+      if (notaEl) notaEl.value = nota;
+      document.getElementById('resenha-form-titulo').textContent = 'Editar Avaliação';
+      const btn = document.getElementById('form-resenha')?.querySelector('button[type=submit]');
+      if (btn) btn.textContent = 'Salvar Alterações';
+      resenhaEditandoId = id;
+      document.getElementById('resenha-texto')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      const novoTexto = prompt('Editar avaliação:', texto);
+      if (novoTexto === null) return;
+      const novaNotaStr = prompt('Nota (1-5):', nota);
+      if (novaNotaStr === null) return;
+      const novaNota = Math.min(5, Math.max(1, parseInt(novaNotaStr) || parseInt(nota)));
+      try {
+        await updateDoc(doc(db, "reviews", id), { texto: novoTexto, nota: novaNota });
+        const pEl = card?.querySelector('p');
+        if (pEl) pEl.textContent = novoTexto;
+        const estrelasEl = card?.querySelector('[style*="ffdf2b"]');
+        if (estrelasEl) estrelasEl.textContent = '★'.repeat(novaNota) + '☆'.repeat(5 - novaNota);
+        if (card) card.dataset.nota = novaNota;
+      } catch(err) { alert('Erro ao editar.'); }
+    }
   }
   if (apagarBtn) {
-    if (!confirm('Apagar esta resenha?')) return;
+    if (!confirm('Apagar esta avaliação?')) return;
     try {
       await deleteDoc(doc(db, "reviews", apagarBtn.dataset.apagarResenha));
       apagarBtn.closest('[data-resenha-id]')?.remove();
@@ -769,51 +821,39 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-// ─── Recomendações ───────────────────────────────────────────
-let recEditandoId = null;
-
-const formRec = document.getElementById('form-recomendacao');
-if (formRec) {
-  formRec.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!currentUser) { showScreen('login'); return; }
-    const midia   = document.getElementById('rec-midia')?.value.trim();
-    const livro   = document.getElementById('rec-livro')?.value.trim();
-    const texto   = document.getElementById('rec-texto')?.value.trim();
-    const spoiler = document.getElementById('rec-spoiler')?.checked;
-    if (!midia || !livro) { alert('Preencha o filme/série e o livro recomendado.'); return; }
-    const btn = formRec.querySelector('button[type=submit]');
-    btn.disabled = true; btn.textContent = 'Salvando…';
-    try {
-      if (recEditandoId) {
-        await updateDoc(doc(db, "recommendations", recEditandoId), { midia, livro, texto, spoiler });
-        recEditandoId = null;
-        document.getElementById('rec-form-titulo').textContent = 'Nova Recomendação';
-        btn.textContent = 'Publicar';
-      } else {
-        await addDoc(collection(db, "recommendations"), {
-          uid: currentUser.uid, nomeUsuario: currentUser.displayName || currentUser.email,
-          midia, livro, texto, spoiler, criadoEm: serverTimestamp(),
-        });
-      }
-      formRec.reset();
-      carregarRecomendacoes();
-    } catch(err) { console.error(err); alert('Erro ao salvar recomendação.'); }
-    finally { btn.disabled = false; btn.textContent = recEditandoId ? 'Salvar Alterações' : 'Publicar'; }
-  });
-}
-
-async function carregarRecomendacoes() {
-  const el = document.getElementById('lista-recomendacoes');
+// ─── Recomendações no Explorar (feed geral) ──────────────────
+async function carregarRecomendacoesExplorar() {
+  const el = document.getElementById('explorar-recomendacoes');
   if (!el) return;
   el.innerHTML = '<p class="opacity-50 text-sm">Carregando recomendações…</p>';
   try {
-    const q = query(collection(db, "recommendations"), orderBy("criadoEm", "desc"), limit(30));
+    const q = query(collection(db, "recommendations"), orderBy("criadoEm", "desc"), limit(20));
+    const snap = await getDocs(q);
+    if (snap.empty) { el.innerHTML = '<p class="opacity-50 text-sm">Nenhuma recomendação ainda. Abra um filme ou série e recomende um livro!</p>'; return; }
+    el.innerHTML = snap.docs.map(d => renderRecCard({ id: d.id, ...d.data() })).join('');
+    ativarSpoilerBtns(el);
+  } catch(err) { console.error('Erro ao carregar recomendações explorar:', err); el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar recomendações.</p>'; }
+}
+
+// ─── Recomendações por mídia (na página do filme/série) ───────
+async function carregarRecomendacoesMidia(tmdbId) {
+  const el = document.getElementById('midia-recomendacoes-lista');
+  if (!el || !tmdbId) return;
+  el.innerHTML = '<p class="opacity-50 text-sm">Carregando recomendações…</p>';
+  try {
+    const q = query(collection(db, "recommendations"), where("tmdbId", "==", String(tmdbId)), orderBy("criadoEm", "desc"), limit(20));
     const snap = await getDocs(q);
     if (snap.empty) { el.innerHTML = '<p class="opacity-50 text-sm">Nenhuma recomendação ainda. Seja o primeiro!</p>'; return; }
     el.innerHTML = snap.docs.map(d => renderRecCard({ id: d.id, ...d.data() })).join('');
     ativarSpoilerBtns(el);
-  } catch(err) { console.error('Erro ao carregar recomendações:', err); el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar recomendações.</p>'; }
+  } catch(err) { console.error('Erro recomendações mídia:', err); el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar recomendações.</p>'; }
+}
+
+function renderSimIndicator(sim) {
+  if (!sim) return '';
+  const icons = '🔗'.repeat(Number(sim));
+  const labels = { 1: 'Pouco parecidos', 2: 'Parecidos', 3: 'Muito parecidos' };
+  return `<span title="${labels[sim] || ''}" style="font-size:0.9rem;margin-left:6px;">${icons}</span>`;
 }
 
 function renderRecCard(r) {
@@ -836,14 +876,14 @@ function renderRecCard(r) {
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-        <span style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;">${r.midia}</span>
+        <span style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;">${r.midiaTitulo || r.midia || '–'}</span>
         <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
-        <span style="font-weight:700;font-size:0.95rem;background:#ffdf2b;color:#000;padding:3px 10px;border:2px solid #000;">${r.livro}</span>
+        <span style="font-weight:700;font-size:0.95rem;background:#ffdf2b;color:#000;padding:3px 10px;border:2px solid #000;">${r.livroNome || r.livro || '–'}</span>
+        ${renderSimIndicator(r.similaridade)}
       </div>
       ${textoHtml}
       ${isOwner ? `
         <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
-          <button data-editar-rec="${r.id}" style="font-size:0.75rem;font-weight:700;padding:4px 10px;border:2px solid #000;background:#ffdf2b;cursor:pointer;">Editar</button>
           <button data-apagar-rec="${r.id}" style="font-size:0.75rem;font-weight:700;padding:4px 10px;border:2px solid #000;background:#fe4c00;color:#fff;cursor:pointer;">Apagar</button>
         </div>` : ''}
     </div>`;
@@ -857,25 +897,9 @@ function renderMinhasRecomendacoes(recs) {
   ativarSpoilerBtns(el);
 }
 
-// Delegação para editar/apagar recomendação
+// Delegação para apagar recomendação
 document.addEventListener('click', async (e) => {
-  const editBtn   = e.target.closest('[data-editar-rec]');
   const apagarBtn = e.target.closest('[data-apagar-rec]');
-  if (editBtn) {
-    const id   = editBtn.dataset.editarRec;
-    const card = editBtn.closest('[data-rec-id]');
-    const midia = card?.querySelector('span[style*="5065ff"]')?.textContent || '';
-    const livro = card?.querySelector('span[style*="ffdf2b"]')?.textContent || '';
-    const texto = card?.querySelector('p')?.textContent || card?.querySelector('.spoiler-blur')?.textContent || '';
-    document.getElementById('rec-midia').value = midia;
-    document.getElementById('rec-livro').value = livro;
-    document.getElementById('rec-texto').value = texto;
-    document.getElementById('rec-form-titulo').textContent = 'Editar Recomendação';
-    const btn = formRec?.querySelector('button[type=submit]');
-    if (btn) btn.textContent = 'Salvar Alterações';
-    recEditandoId = id;
-    document.getElementById('rec-midia')?.scrollIntoView({ behavior: 'smooth' });
-  }
   if (apagarBtn) {
     if (!confirm('Apagar esta recomendação?')) return;
     try {
@@ -884,6 +908,97 @@ document.addEventListener('click', async (e) => {
     } catch(err) { alert('Erro ao apagar.'); }
   }
 });
+
+// ─── Botões de similaridade ───────────────────────────────────
+document.addEventListener('click', (e) => {
+  const simBtn = e.target.closest('.rec-sim-btn');
+  if (!simBtn) return;
+  document.querySelectorAll('.rec-sim-btn').forEach(b => { b.style.background = 'none'; b.style.borderColor = '#000'; });
+  simBtn.style.background = '#ffdf2b';
+  simBtn.style.borderColor = '#000';
+  const input = document.getElementById('rec-similaridade-val');
+  if (input) input.value = simBtn.dataset.value;
+});
+
+// ─── Autocomplete de livro no formulário de recomendação ──────
+let livroSearchTimeout = null;
+document.getElementById('rec-livro-nome')?.addEventListener('input', (e) => {
+  clearTimeout(livroSearchTimeout);
+  const val = e.target.value.trim();
+  const suggestions = document.getElementById('rec-livro-suggestions');
+  if (!suggestions) return;
+  if (val.length < 3) { suggestions.style.display = 'none'; return; }
+  livroSearchTimeout = setTimeout(async () => {
+    try {
+      const livros = await searchBooks(val, 5);
+      if (livros.length === 0) { suggestions.style.display = 'none'; return; }
+      suggestions.innerHTML = livros.map(l => `
+        <div class="livro-suggestion" data-id="${l.id}" data-titulo="${(l.title||'').replace(/"/g,'&quot;')}" data-autor="${(l.author||'').replace(/"/g,'&quot;')}" data-cover="${l.cover||''}"
+          style="padding:0.6rem 1rem;cursor:pointer;border-bottom:1px solid #eee;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:0.5rem;">
+          ${l.cover ? `<img src="${l.cover}" style="width:28px;height:40px;object-fit:cover;border:1px solid #000;flex-shrink:0;">` : ''}
+          <div><div>${l.title}</div><div style="font-size:0.75rem;opacity:0.6;">${l.author}</div></div>
+        </div>`).join('');
+      suggestions.style.display = 'block';
+    } catch(_) { suggestions.style.display = 'none'; }
+  }, 400);
+});
+
+document.addEventListener('click', (e) => {
+  const sug = e.target.closest('.livro-suggestion');
+  if (sug) {
+    document.getElementById('rec-livro-nome').value = sug.dataset.titulo;
+    document.getElementById('rec-livro-id').value = sug.dataset.id;
+    document.getElementById('rec-livro-autor-hidden').value = sug.dataset.autor;
+    document.getElementById('rec-livro-cover-hidden').value = sug.dataset.cover;
+    document.getElementById('rec-livro-suggestions').style.display = 'none';
+    return;
+  }
+  // Fechar sugestões ao clicar fora
+  const suggestions = document.getElementById('rec-livro-suggestions');
+  if (suggestions && !suggestions.contains(e.target) && e.target.id !== 'rec-livro-nome') {
+    suggestions.style.display = 'none';
+  }
+});
+
+// ─── Formulário de recomendação na página de mídia ────────────
+const formMidiaRec = document.getElementById('form-midia-recomendacao');
+if (formMidiaRec) {
+  formMidiaRec.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUser) { showScreen('login'); return; }
+    const livroNome = document.getElementById('rec-livro-nome')?.value.trim();
+    const livroId   = document.getElementById('rec-livro-id')?.value;
+    const livroAutor = document.getElementById('rec-livro-autor-hidden')?.value;
+    const livroCover = document.getElementById('rec-livro-cover-hidden')?.value;
+    const tmdbId    = document.getElementById('rec-tmdb-id')?.value;
+    const midiaTitulo = document.getElementById('rec-midia-titulo')?.value;
+    const midiaTipo = document.getElementById('rec-midia-tipo')?.value;
+    const texto     = document.getElementById('rec-midia-texto')?.value.trim();
+    const spoiler   = document.getElementById('rec-midia-spoiler')?.checked;
+    const similaridade = document.getElementById('rec-similaridade-val')?.value || '0';
+    if (!livroNome) { alert('Digite o nome do livro.'); return; }
+    const btn = formMidiaRec.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Salvando…';
+    try {
+      await addDoc(collection(db, "recommendations"), {
+        uid: currentUser.uid,
+        nomeUsuario: currentUser.displayName || currentUser.email,
+        tmdbId: String(tmdbId),
+        midiaTitulo, midiaTipo,
+        livroNome, livroId: livroId || null, livroAutor: livroAutor || null, livroCover: livroCover || null,
+        texto, spoiler, similaridade: Number(similaridade),
+        criadoEm: serverTimestamp(),
+      });
+      formMidiaRec.reset();
+      document.getElementById('rec-livro-suggestions').style.display = 'none';
+      document.querySelectorAll('.rec-sim-btn').forEach(b => { b.style.background = 'none'; });
+      document.getElementById('rec-similaridade-val').value = '0';
+      carregarRecomendacoesMidia(tmdbId);
+      carregarEstatisticasComunidade();
+    } catch(err) { console.error(err); alert('Erro ao salvar recomendação.'); }
+    finally { btn.disabled = false; btn.textContent = 'Publicar Recomendação'; }
+  });
+}
 
 // ─── Perfil público de outros usuários ──────────────────────
 async function abrirPerfilPublico(uid) {
