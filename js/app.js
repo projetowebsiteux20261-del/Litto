@@ -461,7 +461,7 @@ function showScreen(name) {
   navLinks.forEach(l => { if (l.dataset.nav === name) l.classList.add("active"); });
   if (name === "mapa")          setTimeout(initMap, 100);
   if (name === "home")          { setTimeout(initMapHome, 200); carregarEstatisticasComunidade(); }
-  if (name === "explorar")      { carregarCapasExplorar(); carregarRecomendacoesExplorar(); }
+  if (name === "explorar")      { carregarCapasExplorar(); carregarRecomendacoesExplorar(); carregarAvaliacoesExplorar(); }
   if (name === "perfil" && currentUser) carregarPerfilProprio();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -850,7 +850,19 @@ async function carregarRecomendacoesExplorar() {
   } catch(err) { console.error('Erro ao carregar recomendações explorar:', err); el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar recomendações.</p>'; }
 }
 
-// ─── Recomendações por mídia (na página do filme/série) ───────
+// ─── Avaliações no Explorar (feed geral) ─────────────────────
+async function carregarAvaliacoesExplorar() {
+  const el = document.getElementById('explorar-avaliacoes');
+  if (!el) return;
+  el.innerHTML = '<p class="opacity-50 text-sm">Carregando avaliações…</p>';
+  try {
+    const q = query(collection(db, "reviews"), orderBy("criadoEm", "desc"), limit(20));
+    const snap = await getDocs(q);
+    if (snap.empty) { el.innerHTML = '<p class="opacity-50 text-sm">Nenhuma avaliação ainda.</p>'; return; }
+    el.innerHTML = snap.docs.map(d => renderResenhaCard({ id: d.id, ...d.data() })).join('');
+    ativarSpoilerBtns(el);
+  } catch(err) { console.error('Erro ao carregar avaliações explorar:', err); el.innerHTML = '<p class="opacity-50 text-sm">Erro ao carregar avaliações.</p>'; }
+}
 async function carregarRecomendacoesMidia(tmdbId) {
   const el = document.getElementById('midia-recomendacoes-lista');
   if (!el || !tmdbId) return;
