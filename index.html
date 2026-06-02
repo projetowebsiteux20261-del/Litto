@@ -63,14 +63,17 @@
     .neo-border-thick { border: 4px solid #000; }
 
     #screen-explorar, #screen-bibliotecas-digitais,
-    #screen-busca, #screen-livro, #screen-midia {
+    #screen-busca, #screen-livro, #screen-midia,
+    #screen-recomendacoes, #screen-perfil-publico {
       display: none;
     }
     #screen-explorar.active,
     #screen-bibliotecas-digitais.active,
     #screen-busca.active,
     #screen-livro.active,
-    #screen-midia.active {
+    #screen-midia.active,
+    #screen-recomendacoes.active,
+    #screen-perfil-publico.active {
       display: block;
     }
   </style>
@@ -93,10 +96,11 @@
   <header id="site-header" role="banner">
     <button class="header-logo" data-nav="home" aria-label="Litto – página inicial">Litto</button>
     <nav class="header-nav" aria-label="Navegação principal">
-      <a data-nav="home"     role="button" tabindex="0">Início</a>
-      <a data-nav="mapa"     role="button" tabindex="0">Bibliotecas</a>
-      <a data-nav="explorar" role="button" tabindex="0">Explorar</a>
-      <a data-nav="perfil"   role="button" tabindex="0">Perfil</a>
+      <a data-nav="home"           role="button" tabindex="0">Início</a>
+      <a data-nav="mapa"           role="button" tabindex="0">Bibliotecas</a>
+      <a data-nav="explorar"       role="button" tabindex="0">Explorar</a>
+      <a data-nav="recomendacoes"  role="button" tabindex="0">Recomendações</a>
+      <a data-nav="perfil"         role="button" tabindex="0">Perfil</a>
     </nav>
     <div class="header-actions">
       <button id="header-cadastro-btn" class="btn-primary btn-sm" data-nav="cadastro" aria-label="Criar conta">Cadastro</button>
@@ -176,6 +180,24 @@
               <button class="btn-secondary-inv" data-nav="cadastro">Criar Conta</button>
               <button id="proxima-curiosidade" class="btn-secondary-inv" type="button">Próxima curiosidade →</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estatísticas da comunidade -->
+      <div style="background:var(--text);padding:3rem 5%;">
+        <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;text-align:center;">
+          <div style="padding:1.5rem;border:2px solid rgba(255,255,255,0.2);">
+            <p id="stat-usuarios" style="font-size:2.5rem;font-weight:900;color:var(--secondary);">–</p>
+            <p style="font-size:0.8rem;font-weight:700;color:#fff;opacity:0.7;text-transform:uppercase;letter-spacing:.05em;">Leitores</p>
+          </div>
+          <div style="padding:1.5rem;border:2px solid rgba(255,255,255,0.2);">
+            <p id="stat-recomendacoes" style="font-size:2.5rem;font-weight:900;color:var(--primary);">–</p>
+            <p style="font-size:0.8rem;font-weight:700;color:#fff;opacity:0.7;text-transform:uppercase;letter-spacing:.05em;">Recomendações</p>
+          </div>
+          <div style="padding:1.5rem;border:2px solid rgba(255,255,255,0.2);">
+            <p style="font-size:2.5rem;font-weight:900;color:var(--secondary);">∞</p>
+            <p style="font-size:0.8rem;font-weight:700;color:#fff;opacity:0.7;text-transform:uppercase;letter-spacing:.05em;">Histórias</p>
           </div>
         </div>
       </div>
@@ -624,6 +646,13 @@
         </section>
 
         <!-- Livros relacionados -->
+        <section class="max-w-6xl mx-auto mb-6 flex flex-wrap gap-3">
+          <button id="btn-add-filme-visto" class="flex items-center gap-2 font-black text-sm px-5 py-3 border-2 border-black bg-orange text-white hover:-translate-y-0.5 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">check_circle</span> Já assisti
+          </button>
+        </section>
+
+        <!-- Livros relacionados -->
         <section class="max-w-6xl mx-auto mb-16 bg-blue/5 p-10 border-2 border-black shadow-[8px_8px_0px_0px_rgba(80,101,255,1)]">
           <h2 class="text-3xl font-bold mb-2">Livros Relacionados</h2>
           <p class="text-blue font-bold mb-8">Das telas para as páginas</p>
@@ -712,13 +741,67 @@
           </div>
         </section>
 
+        <!-- Botões estante -->
+        <section class="max-w-6xl mx-auto mb-10 flex flex-wrap gap-3">
+          <button id="btn-add-lido" class="flex items-center gap-2 font-black text-sm px-5 py-3 border-2 border-black bg-blue text-white hover:-translate-y-0.5 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">check_circle</span> Já li
+          </button>
+          <button id="btn-add-quer-ler" class="flex items-center gap-2 font-black text-sm px-5 py-3 border-2 border-black bg-yellow text-black hover:-translate-y-0.5 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">bookmark_add</span> Quero ler
+          </button>
+        </section>
+
+        <!-- Resenhas -->
+        <section class="max-w-6xl mx-auto mb-10">
+          <h2 class="text-3xl font-black mb-8 uppercase">Resenhas da Comunidade</h2>
+          <div id="livro-resenhas-lista" aria-live="polite">
+            <p class="opacity-50 text-sm">Seja o primeiro a resenhar este livro!</p>
+          </div>
+        </section>
+
+        <!-- Formulário de resenha -->
+        <section class="max-w-6xl mx-auto mb-16">
+          <div class="fundacao-form-card p-8">
+            <h2 id="resenha-form-titulo" class="text-2xl font-black mb-6 uppercase">Escrever Resenha</h2>
+            <form id="form-resenha" novalidate>
+              <!-- Campos ocultos com metadados do livro -->
+              <input type="hidden" id="resenha-livro-id" />
+              <input type="hidden" id="resenha-livro-titulo" />
+              <input type="hidden" id="resenha-livro-autor" />
+              <input type="hidden" id="resenha-livro-cover" />
+
+              <div class="form-group" style="margin-bottom:1.25rem;">
+                <label for="resenha-nota" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">Nota (1–5)</label>
+                <select id="resenha-nota" style="border:2px solid #000;padding:0.6rem 1rem;font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:600;background:#fff;outline:none;cursor:pointer;">
+                  <option value="5">★★★★★ — Obra-prima</option>
+                  <option value="4">★★★★☆ — Muito bom</option>
+                  <option value="3">★★★☆☆ — Bom</option>
+                  <option value="2">★★☆☆☆ — Regular</option>
+                  <option value="1">★☆☆☆☆ — Decepcionante</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom:1.25rem;">
+                <label for="resenha-texto" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">Sua resenha</label>
+                <textarea id="resenha-texto" rows="5" placeholder="O que você achou do livro? Compartilhe sua experiência…" style="width:100%;padding:0.85rem;border:2px solid #000;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;resize:vertical;background:#fff;" required></textarea>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
+                <input type="checkbox" id="resenha-spoiler" style="width:18px;height:18px;border:2px solid #000;cursor:pointer;accent-color:#fe4c00;" />
+                <label for="resenha-spoiler" style="font-weight:700;font-size:0.85rem;cursor:pointer;">Contém spoilers — ocultar por padrão</label>
+              </div>
+
+              <button type="submit" class="form-btn" style="max-width:280px;">Publicar Resenha</button>
+            </form>
+          </div>
+        </section>
+
       </div>
       <footer class="site-footer" role="contentinfo">
         <div>
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        
       </footer>
     </section>
 
@@ -727,6 +810,8 @@
     ============================================================ -->
     <section id="screen-perfil" class="screen" aria-label="Perfil do usuário">
       <div class="page-wrapper">
+
+        <!-- Cabeçalho do perfil -->
         <div class="hero-section" role="region" aria-label="Dados do perfil">
           <div class="hero-avatar" aria-hidden="true">
             <span class="material-symbols-outlined" style="font-size:5rem;">person</span>
@@ -735,46 +820,94 @@
             <h1 class="hero-name" id="perfil-nome">–</h1>
             <p class="hero-handle" id="perfil-handle"></p>
             <div class="hero-actions">
-              <button id="btn-logout" class="btn-secondary" aria-label="Sair da conta"><span class="material-symbols-outlined" aria-hidden="true">logout</span> Sair</button>
+              <button id="btn-logout" class="btn-secondary" aria-label="Sair da conta">
+                <span class="material-symbols-outlined" aria-hidden="true">logout</span> Sair
+              </button>
             </div>
           </div>
         </div>
 
+        <!-- Estatísticas reais -->
         <section style="margin-bottom:3rem;" aria-labelledby="stats-h">
           <h2 id="stats-h" class="section-title" style="margin-bottom:1.25rem;">Estatísticas</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;" role="list">
-            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem"><p style="font-size:2rem;font-weight:900;color:var(--tertiary);">47</p><p style="font-size:0.8rem;font-weight:700;">Livros Lidos</p></div>
-            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem"><p style="font-size:2rem;font-weight:900;color:var(--primary);">12</p><p style="font-size:0.8rem;font-weight:700;">Avaliações</p></div>
-            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem"><p style="font-size:2rem;font-weight:900;color:var(--text);">8</p><p style="font-size:0.8rem;font-weight:700;">Recomendações</p></div>
-            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem"><p style="font-size:2rem;font-weight:900;color:var(--tertiary);">23</p><p style="font-size:0.8rem;font-weight:700;">Quero Ler</p></div>
+            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem">
+              <p id="stat-lidos"   style="font-size:2rem;font-weight:900;color:var(--tertiary);">0</p>
+              <p style="font-size:0.8rem;font-weight:700;">Livros Lidos</p>
+            </div>
+            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem">
+              <p id="stat-quer-ler" style="font-size:2rem;font-weight:900;color:var(--primary);">0</p>
+              <p style="font-size:0.8rem;font-weight:700;">Quero Ler</p>
+            </div>
+            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem">
+              <p id="stat-filmes" style="font-size:2rem;font-weight:900;color:var(--text);">0</p>
+              <p style="font-size:0.8rem;font-weight:700;">Filmes/Séries</p>
+            </div>
+            <div class="bk-card" style="padding:1.25rem;text-align:center;" role="listitem">
+              <p id="stat-resenhas" style="font-size:2rem;font-weight:900;color:var(--tertiary);">0</p>
+              <p style="font-size:0.8rem;font-weight:700;">Resenhas</p>
+            </div>
           </div>
         </section>
 
-        <section style="margin-bottom:3rem;" aria-labelledby="estante-h">
+        <!-- Minha Estante com tabs reais -->
+        <section style="margin-bottom:3rem;" aria-labelledby="estante-h" data-tabs-container>
           <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem;">
             <div class="section-header" style="margin-bottom:0;">
               <span class="material-symbols-outlined section-icon" style="color:var(--secondary);" aria-hidden="true">book_4</span>
               <h2 id="estante-h" class="section-title">Minha Estante</h2>
             </div>
             <div class="tabs" role="tablist" aria-label="Filtro da estante">
-              <button class="tab-btn active" role="tab" aria-selected="true">LIDOS</button>
-              <button class="tab-btn" role="tab" aria-selected="false">QUERO LER</button>
+              <button class="tab-btn active" role="tab" aria-selected="true"  data-tab="lidos">LIDOS</button>
+              <button class="tab-btn"        role="tab" aria-selected="false" data-tab="quer-ler">QUERO LER</button>
+              <button class="tab-btn"        role="tab" aria-selected="false" data-tab="filmes">FILMES</button>
             </div>
           </div>
-          <div class="shelf-grid" role="list">
-            <div class="bk-card" role="listitem"><div class="book-spine" style="background:var(--tertiary);"><span class="material-symbols-outlined" style="font-size:2.5rem;color:#fff;" aria-hidden="true">menu_book</span></div><div style="padding:0.75rem;"><h4 style="font-weight:700;font-size:0.875rem;">Fundação e Império</h4><p style="font-size:0.75rem;color:#555;margin-top:0.2rem;">Isaac Asimov</p></div></div>
-            <div class="bk-card" role="listitem"><div class="book-spine" style="background:var(--primary);"><span class="material-symbols-outlined" style="font-size:2.5rem;color:#fff;" aria-hidden="true">book</span></div><div style="padding:0.75rem;"><h4 style="font-weight:700;font-size:0.875rem;">Neuromancer</h4><p style="font-size:0.75rem;color:#555;margin-top:0.2rem;">William Gibson</p></div></div>
-            <div class="bk-card" role="listitem"><div class="book-spine" style="background:var(--secondary);"><span class="material-symbols-outlined" style="font-size:2.5rem;color:#1a1b24;" aria-hidden="true">library_books</span></div><div style="padding:0.75rem;"><h4 style="font-weight:700;font-size:0.875rem;">O Fim da Infância</h4><p style="font-size:0.75rem;color:#555;margin-top:0.2rem;">Arthur C. Clarke</p></div></div>
-            <div class="bk-card" role="listitem"><div class="book-spine" style="background:var(--tertiary);"><span class="material-symbols-outlined" style="font-size:2.5rem;color:#fff;" aria-hidden="true">import_contacts</span></div><div style="padding:0.75rem;"><h4 style="font-weight:700;font-size:0.875rem;">1984</h4><p style="font-size:0.75rem;color:#555;margin-top:0.2rem;">George Orwell</p></div></div>
+          <div data-tab-panel="lidos">
+            <div id="estante-lidos" class="shelf-grid" role="list">
+              <p class="opacity-50 text-sm col-span-full">Nenhum livro aqui ainda.</p>
+            </div>
+          </div>
+          <div data-tab-panel="quer-ler" style="display:none;">
+            <div id="estante-quer-ler" class="shelf-grid" role="list">
+              <p class="opacity-50 text-sm col-span-full">Nenhum livro aqui ainda.</p>
+            </div>
+          </div>
+          <div data-tab-panel="filmes" style="display:none;">
+            <div id="estante-filmes" class="shelf-grid" role="list">
+              <p class="opacity-50 text-sm col-span-full">Nenhum filme/série aqui ainda.</p>
+            </div>
           </div>
         </section>
+
+        <!-- Minhas resenhas -->
+        <section style="margin-bottom:3rem;" aria-labelledby="minhas-resenhas-h">
+          <div class="section-header" style="margin-bottom:1.25rem;">
+            <span class="material-symbols-outlined section-icon" style="color:var(--primary);" aria-hidden="true">rate_review</span>
+            <h2 id="minhas-resenhas-h" class="section-title">Minhas Resenhas</h2>
+          </div>
+          <div id="perfil-resenhas">
+            <p class="opacity-50 text-sm">Você ainda não escreveu nenhuma resenha.</p>
+          </div>
+        </section>
+
+        <!-- Minhas recomendações -->
+        <section style="margin-bottom:3rem;" aria-labelledby="minhas-recs-h">
+          <div class="section-header" style="margin-bottom:1.25rem;">
+            <span class="material-symbols-outlined section-icon" style="color:var(--tertiary);" aria-hidden="true">recommend</span>
+            <h2 id="minhas-recs-h" class="section-title">Minhas Recomendações</h2>
+          </div>
+          <div id="perfil-recomendacoes">
+            <p class="opacity-50 text-sm">Você ainda não fez nenhuma recomendação.</p>
+          </div>
+        </section>
+
       </div>
       <footer class="site-footer" role="contentinfo">
         <div>
           <span class="footer-logo">Litto Book Club.</span>
           <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
         </div>
-        
       </footer>
     </section>
 
@@ -839,14 +972,135 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         TELA: RECOMENDAÇÕES DA COMUNIDADE
+    ============================================================ -->
+    <section id="screen-recomendacoes" class="screen" aria-label="Recomendações da comunidade" style="display:none;">
+      <div class="pt-8 pb-20 px-[5%] max-w-5xl mx-auto">
+
+        <header class="mb-10">
+          <div class="inline-block bg-yellow text-black px-4 py-1 border-2 border-black font-black text-sm mb-4 neo-brutal-shadow">COMUNIDADE</div>
+          <h1 class="text-4xl md:text-5xl font-black mb-3 text-dark uppercase">Recomendações</h1>
+          <p class="font-semibold text-gray-500 max-w-xl">Se você assistiu algo e lembrou de um livro incrível — compartilhe! Conecte filmes e séries com as obras que os inspiraram.</p>
+        </header>
+
+        <!-- Formulário de nova recomendação -->
+        <div class="fundacao-form-card p-8 mb-12">
+          <h2 id="rec-form-titulo" class="text-2xl font-black mb-6 uppercase">Nova Recomendação</h2>
+          <form id="form-recomendacao" novalidate>
+
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <label for="rec-midia" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
+                Filme ou série <span style="color:#fe4c00;">*</span>
+              </label>
+              <input type="text" id="rec-midia" placeholder="Ex: Duna (2021)" style="width:100%;border:2px solid #000;padding:0.75rem 1rem;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;background:#fff;" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <label for="rec-livro" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">
+                Livro recomendado <span style="color:#fe4c00;">*</span>
+              </label>
+              <input type="text" id="rec-livro" placeholder="Ex: Duna — Frank Herbert" style="width:100%;border:2px solid #000;padding:0.75rem 1rem;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;background:#fff;" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom:1.25rem;">
+              <label for="rec-texto" style="font-weight:700;font-size:0.85rem;margin-bottom:0.4rem;display:block;">Comentário <span style="opacity:0.5;font-weight:500;">(opcional)</span></label>
+              <textarea id="rec-texto" rows="4" placeholder="Por que você recomenda? Qual é a conexão entre eles?" style="width:100%;padding:0.85rem;border:2px solid #000;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;resize:vertical;background:#fff;"></textarea>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
+              <input type="checkbox" id="rec-spoiler" style="width:18px;height:18px;border:2px solid #000;cursor:pointer;accent-color:#fe4c00;" />
+              <label for="rec-spoiler" style="font-weight:700;font-size:0.85rem;cursor:pointer;">Contém spoilers — ocultar comentário por padrão</label>
+            </div>
+
+            <button type="submit" class="form-btn" style="max-width:240px;">Publicar</button>
+          </form>
+        </div>
+
+        <!-- Lista de recomendações da comunidade -->
+        <section aria-labelledby="lista-recs-h">
+          <div class="flex items-center gap-4 mb-8">
+            <div class="w-10 h-10 bg-blue border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-white">recommend</span>
+            </div>
+            <h2 id="lista-recs-h" class="text-2xl font-black">Da Comunidade</h2>
+          </div>
+          <div id="lista-recomendacoes" style="display:grid;gap:1rem;" aria-live="polite">
+            <p class="opacity-50 text-sm">Carregando recomendações…</p>
+          </div>
+        </section>
+
+      </div>
+      <footer class="site-footer" role="contentinfo">
+        <div>
+          <span class="footer-logo">Litto Book Club.</span>
+          <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ============================================================
+         TELA: PERFIL PÚBLICO DE OUTRO USUÁRIO
+    ============================================================ -->
+    <section id="screen-perfil-publico" class="screen" aria-label="Perfil público" style="display:none;">
+      <div class="page-wrapper">
+
+        <button id="pub-perfil-back-btn" class="flex items-center gap-2 font-black text-sm uppercase border-2 border-black px-4 py-2 mb-8 hover:bg-black hover:text-white transition-all" style="display:inline-flex;">
+          <span class="material-symbols-outlined text-lg">arrow_back</span> Voltar
+        </button>
+
+        <div class="hero-section" role="region" aria-label="Dados do perfil público" style="margin-bottom:2.5rem;">
+          <div class="hero-avatar" aria-hidden="true">
+            <span class="material-symbols-outlined" style="font-size:5rem;">person</span>
+          </div>
+          <div class="hero-info">
+            <h1 class="hero-name" id="pub-perfil-nome">–</h1>
+            <p class="hero-handle" id="pub-perfil-handle"></p>
+          </div>
+        </div>
+
+        <section style="margin-bottom:3rem;">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-10 h-10 bg-blue border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-white">recommend</span>
+            </div>
+            <h2 class="text-2xl font-black">Recomendações</h2>
+          </div>
+          <div id="pub-recomendacoes" style="display:grid;gap:1rem;" aria-live="polite">
+            <p class="opacity-50 text-sm">Carregando…</p>
+          </div>
+        </section>
+
+        <section style="margin-bottom:3rem;">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-10 h-10 bg-orange border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span class="material-symbols-outlined text-white">rate_review</span>
+            </div>
+            <h2 class="text-2xl font-black">Resenhas</h2>
+          </div>
+          <div id="pub-resenhas" style="display:grid;gap:1rem;" aria-live="polite">
+            <p class="opacity-50 text-sm">Carregando…</p>
+          </div>
+        </section>
+
+      </div>
+      <footer class="site-footer" role="contentinfo">
+        <div>
+          <span class="footer-logo">Litto Book Club.</span>
+          <p class="footer-copy">© 2026 Litto Book Club. Cultivando histórias e adaptações.</p>
+        </div>
+      </footer>
+    </section>
+
   </main>
 
   <!-- ===== BOTTOM NAV ===== -->
   <nav id="bottom-nav" aria-label="Navegação por abas">
-    <button class="bottom-nav-btn" data-nav="home" aria-label="Início"><span class="material-symbols-outlined" aria-hidden="true">home</span>Início</button>
-    <button class="bottom-nav-btn" data-nav="explorar" aria-label="Explorar"><span class="material-symbols-outlined" aria-hidden="true">explore</span>Explorar</button>
-    <button class="bottom-nav-btn" data-nav="mapa" aria-label="Mapa de bibliotecas"><span class="material-symbols-outlined" aria-hidden="true">map</span>Mapa</button>
-    <button class="bottom-nav-btn" data-nav="perfil" aria-label="Perfil"><span class="material-symbols-outlined" aria-hidden="true">person</span>Perfil</button>
+    <button class="bottom-nav-btn" data-nav="home"          aria-label="Início"><span class="material-symbols-outlined" aria-hidden="true">home</span>Início</button>
+    <button class="bottom-nav-btn" data-nav="explorar"      aria-label="Explorar"><span class="material-symbols-outlined" aria-hidden="true">explore</span>Explorar</button>
+    <button class="bottom-nav-btn" data-nav="recomendacoes" aria-label="Recomendações"><span class="material-symbols-outlined" aria-hidden="true">recommend</span>Recomenda</button>
+    <button class="bottom-nav-btn" data-nav="mapa"          aria-label="Mapa de bibliotecas"><span class="material-symbols-outlined" aria-hidden="true">map</span>Mapa</button>
+    <button id="bottom-nav-login" class="bottom-nav-btn" data-nav="login" aria-label="Entrar"><span class="material-symbols-outlined" aria-hidden="true">login</span>Entrar</button>
   </nav>
 
 </div>
