@@ -120,6 +120,65 @@ async function carregarCapasExplorar() {
   });
 }
 
+// ─── Navegação por tag de gênero ─────────────────────────────
+function navegarParaTagGenero(genreName) {
+  // Mapa de nome de gênero (PT) → genre-id TMDB
+  const genreMap = {
+    'Ação': 28, 'Action': 28,
+    'Aventura': 12, 'Adventure': 12,
+    'Animação': 16, 'Animation': 16,
+    'Comédia': 35, 'Comedy': 35,
+    'Crime': 80,
+    'Documentário': 99, 'Documentary': 99,
+    'Drama': 18,
+    'Família': 10751, 'Family': 10751,
+    'Fantasia': 14, 'Fantasy': 14,
+    'História': 36, 'History': 36,
+    'Terror': 27, 'Horror': 27,
+    'Mistério': 9648, 'Mystery': 9648,
+    'Romance': 10749,
+    'Ficção científica': 878, 'Science Fiction': 878, 'Sci-Fi': 878,
+    'Thriller': 53,
+    'Guerra': 10752, 'War': 10752,
+    'Faroeste': 37, 'Western': 37,
+    // Categorias Google Books → genre TMDB aproximado
+    'Fiction': 18,
+    'Juvenile Fiction': 10751,
+    'Young Adult Fiction': 18,
+    'Literary Criticism': 18,
+    'Science Fiction & Fantasy': 878,
+    'Horror Fiction': 27,
+    'Mystery & Detective': 9648,
+    'Thriller & Suspense': 53,
+    'Historical Fiction': 36,
+  };
+
+  const genreId = genreMap[genreName] ?? null;
+
+  // Ativa o botão de filtro correspondente (ou "Todos" se não encontrar)
+  document.querySelectorAll('.filtro-genre-btn').forEach(b => {
+    b.setAttribute('aria-pressed', 'false');
+    b.style.background = '#fff';
+  });
+
+  if (genreId) {
+    const matchBtn = document.querySelector(`.filtro-genre-btn[data-genre-id="${genreId}"]`);
+    if (matchBtn) {
+      matchBtn.setAttribute('aria-pressed', 'true');
+      matchBtn.style.background = '#ffdf2b';
+    }
+  } else {
+    // Fallback: ativa "Todos" e faz busca pelo nome do gênero como texto
+    const todosBtn = document.querySelector('.filtro-genre-btn[data-genre-id=""]');
+    if (todosBtn) { todosBtn.setAttribute('aria-pressed', 'true'); todosBtn.style.background = '#ffdf2b'; }
+  }
+
+  const buscaInput = document.getElementById('busca-input');
+  if (buscaInput) buscaInput.value = genreId ? '' : genreName;
+
+  showScreen('busca');
+  realizarBusca(genreId ? '' : genreName);
+}
 // ─── Filtros de busca ────────────────────────────────────────
 document.getElementById('busca-filtros')?.addEventListener('click', e => {
   const btn = e.target.closest('.filtro-genre-btn');
