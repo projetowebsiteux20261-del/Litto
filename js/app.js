@@ -383,7 +383,7 @@ async function abrirLivro(workId, titulo, autor, cover, ano) {
   const lerOL      = document.getElementById('ler-openlibrary');
   if (lerBiblion) lerBiblion.href = `https://www.google.com/search?q=${tituloEnc}+site:biblion.odilo.us`;
   if (lerMec)     lerMec.href     = `https://www.google.com/search?q=${tituloEnc}+site:meclivros.mec.gov.br`;
-  if (lerDominio) lerDominio.href = `https://dominiopublico.mec.gov.br/pesquisa/PesquisaObraForm.jsp?co_autor=&tx_titulo=${encodeURIComponent(titulo)}`;
+  if (lerDominio) lerDominio.href = `https://www.google.com/search?q=${tituloEnc}+site:dominiopublico.mec.gov.br`;
   if (lerOL)      lerOL.href      = `https://openlibrary.org/search?q=${encodeURIComponent(titulo)}`;
   const coverWrap = document.getElementById('livro-cover-wrap');
   coverWrap.innerHTML = cover
@@ -510,14 +510,17 @@ function atualizarHeaderAuth(user) {
   const btnCadastro = document.getElementById("header-cadastro-btn");
   const btnAvatar   = document.getElementById("header-avatar");
   const btnLoginNav = document.getElementById("bottom-nav-login");
+  const btnHomeCriarConta = document.getElementById("home-criar-conta-btn");
   if (user) {
     if (btnCadastro) btnCadastro.style.display = "none";
+    if (btnHomeCriarConta) btnHomeCriarConta.style.display = "none";
     if (btnAvatar)   btnAvatar.style.display   = "flex";
     const initial = document.getElementById("avatar-initial");
     if (initial) { initial.textContent = (user.displayName || user.email || "U")[0].toUpperCase(); initial.style.fontFamily = "Poppins, sans-serif"; initial.style.fontSize = "1rem"; initial.style.fontWeight = "900"; }
     if (btnLoginNav) { btnLoginNav.dataset.nav = "perfil"; btnLoginNav.setAttribute("aria-label", "Perfil"); btnLoginNav.querySelector(".material-symbols-outlined").textContent = "person"; btnLoginNav.lastChild.textContent = "Perfil"; }
   } else {
     if (btnCadastro) btnCadastro.style.display = "";
+    if (btnHomeCriarConta) btnHomeCriarConta.style.display = "";
     if (btnAvatar)   btnAvatar.style.display   = "none";
     if (btnLoginNav) { btnLoginNav.dataset.nav = "login"; btnLoginNav.setAttribute("aria-label", "Entrar"); btnLoginNav.querySelector(".material-symbols-outlined").textContent = "login"; const span = btnLoginNav.querySelector(".material-symbols-outlined"); if (span && span.nextSibling) span.nextSibling.textContent = "Entrar"; }
   }
@@ -876,7 +879,7 @@ function renderRecCard(r) {
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-        <span style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;">${r.midiaTitulo || r.midia || '(obra não identificada)'}</span>
+        <span data-abrir-midia-id="${r.tmdbId||''}" data-abrir-midia-tipo="${r.midiaTipo||'movie'}" data-abrir-midia-titulo="${(r.midiaTitulo||r.midia||'').replace(/"/g,'&quot;')}" style="font-weight:700;font-size:0.95rem;background:#5065ff;color:#fff;padding:3px 10px;border:2px solid #000;${r.tmdbId ? 'cursor:pointer;text-decoration:underline dotted;' : ''}">${r.midiaTitulo || r.midia || '(obra não identificada)'}</span>
         <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
         <span style="font-weight:700;font-size:0.95rem;background:#ffdf2b;color:#000;padding:3px 10px;border:2px solid #000;">${r.livroNome || r.livro || '–'}</span>
         ${renderSimIndicator(r.similaridade)}
@@ -1017,8 +1020,8 @@ async function abrirPerfilPublico(uid) {
   try {
     const userSnap = await getDoc(doc(db, "users", uid));
     const userData = userSnap.exists() ? userSnap.data() : {};
-    if (elNome)   elNome.textContent   = userData.nome   || 'Usuário';
-    if (elHandle) elHandle.textContent = userData.email  || '';
+    if (elNome)   elNome.textContent   = userData.nome || 'Usuário';
+    if (elHandle) elHandle.textContent = '';
 
     const [recsSnap, resSnap] = await Promise.all([
       getDocs(query(collection(db, "recommendations"), where("uid", "==", uid), orderBy("criadoEm", "desc"), limit(20))),
